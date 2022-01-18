@@ -1,7 +1,8 @@
-﻿#include <iostream>
+﻿#pragma once
+
+#include <iostream>
 #include "enums.h"
-#include "InterfaceWork.h"
-#include "MyArray.h"
+#include "Interface.h"
 
 
 
@@ -12,7 +13,7 @@ int main()
     setlocale(LC_ALL, "Russian");                   // Задаем локаль
 
 
-    InterfaceWork<MyArray<int>> window{ MyArray<int>(15) };
+    Interface<int> window{};
 
 
     /* Запускаем бесконечный цикл ожидая ввод команды от пользователя  */

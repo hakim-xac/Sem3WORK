@@ -3,6 +3,8 @@
 #include <queue>
 #include <iostream>
 #include <type_traits>
+#include <vector>
+#include <list>
 #include "enums.h"
 
 namespace WORK {
@@ -20,31 +22,25 @@ namespace WORK {
 		std::ostream& out										{ std::cout };			// буфер вывода
 		size_t maxTableWidth									{ 110 };				// ширина выводимой строки
 		int maxTableColumnsInArray								{ 5 };					// количество колонов при выводе массива
+		const size_t maxSize									{ 12 };
 		std::queue <std::string> bufferForStatusBar				{};						// очередь для статус бара
 		Keys activeKey											{ Keys::EmptyKey };		// 
 		std::vector <std::string> bufferForMenu{};										// буфер меню
+		std::vector <TypeArray> array;
+		std::list <TypeArray> list;
+		void addToStatusBar(const std::string&& str, bool isFormated = true);
 
-
-	private:
-		Interface() = delete;															// запрещаем создавать пустой класс
+	private:															// запрещаем создавать пустой класс
 
 		void generateMenu();															// генеригует меню
-	protected:
-
-
-		TypeArray myTypeArray;
-			
-		void addToStatusBar(const std::string&& str, bool isFormated = true);			// добавляет в очередь статус бара, строку для вывода
-
-		bool flagClearArrayAndHash								{ true };				// флаг пустого массива и, следовательно, хеш-таблиц
-
 
 	public:
 		
-		Interface(TypeArray&& myTypeArray);
+		Interface();
 
 		constexpr size_t getMaxTableWidth()			const;					// возврат ширины максимальной длины используемой строки в приложении
 		constexpr size_t getMaxTableColumns()		const;					// возврат количества колонок "таблицы", при выводе данных массива и хеш-таблиц
+		constexpr size_t getMaxSize()				const;					// возврат количества колонок "таблицы", при выводе данных массива и хеш-таблиц
 
 		Keys getActiveKey()							const;					// возврат текущего кода клавиши
 		void setActiveKey(Keys key);										// задает код клавиши
@@ -52,7 +48,7 @@ namespace WORK {
 		constexpr void showHeader();										// выводит заголовок
 		constexpr void showMenu();											// выводит меню
 		void showStatusBar();												// выводит информацию из статус бара
-
+		void readKey();
 		constexpr  std::string delimiter(char del = '=') const;				// возврат разделителя
 
 
@@ -65,6 +61,7 @@ namespace WORK {
 		/// генерирует строку согласно формату программы с 2 параметрами
 		///
 		constexpr const std::string generatingStrings(const std::string&& str, const std::string&& str2, char del = ' ') const;
+
 
 	};
 }
@@ -79,7 +76,7 @@ namespace WORK {
 
 template <class TypeArray>
 WORK::Interface<TypeArray>
-::Interface(TypeArray&& myTypeArray) : myTypeArray(myTypeArray) {
+::Interface() {
 	generateMenu();
 }
 
@@ -133,6 +130,14 @@ constexpr size_t WORK::Interface<TypeArray>
 ::getMaxTableColumns() const
 {
 	return maxTableColumnsInArray;
+}
+
+
+template <class TypeArray>
+constexpr size_t WORK::Interface<TypeArray>
+::getMaxSize() const
+{
+	return maxSize;
 }
 
 
@@ -270,4 +275,46 @@ constexpr const std::string WORK::Interface<TypeArray>
 		std::cout << ex.what();
 		return {};
 	}
+}
+
+
+
+template<class TypeArray>
+void WORK::Interface<TypeArray>
+::readKey()
+{
+
+	if (this->getActiveKey() == Keys::EmptyKey)
+	{
+		this->setActiveKey(static_cast<Keys>(std::cin.get()));	// Принимаем один символ
+		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Очищаем остальной буфер
+	}
+	switch (this->getActiveKey())
+	{
+	case Keys::Exit:                                    // 0
+		exit(0);                                        // Выход из цикла
+		break;
+	case Keys::DirectSelectionSort:                     // 1
+		break;
+	case Keys::ShakerSort:								// 2
+		break;
+	case Keys::ShellSorting:							// 3
+		break;
+	case Keys::Pyramid:									// 4
+		break;
+	case Keys::HoareSorting:							// 5
+		break;
+	case Keys::Merger:									// 6
+		break;
+	case Keys::DigitalSorting:							// 7
+		break;
+	case Keys::QuickSearchBegin:						// 8
+		break;
+	case Keys::QuickSearchEnd:							// 9
+		break;
+	default:
+		this->addToStatusBar("Введена не верная команда!");            // любая клавиша отсутствующая в перечислении Keys
+		break;
+	}
+	this->setActiveKey(Keys::EmptyKey);
 }
