@@ -19,20 +19,25 @@ namespace WORK {
 	template <class TypeArray>
 	class Interface
 	{
-		std::ostream& out										{ std::cout };			// буфер вывода
-		size_t maxTableWidth									{ 110 };				// ширина выводимой строки
-		int maxTableColumnsInArray								{ 5 };					// количество колонов при выводе массива
-		const size_t maxSize									{ 12 };
-		std::queue <std::string> bufferForStatusBar				{};						// очередь для статус бара
-		Keys activeKey											{ Keys::EmptyKey };		// 
-		std::vector <std::string> bufferForMenu{};										// буфер меню
-		std::vector <TypeArray> array;
-		std::list <TypeArray> list;
+		std::ostream& out;										// буфер вывода
+		size_t						maxTableWidth;				// ширина выводимой строки
+		int							maxTableColumnsInArray;		// количество колонов при выводе массива
+		const size_t				maxSize;
+		std::queue <std::string>	bufferForStatusBar;			// очередь для статус бара
+		Keys						activeKey;					// 
+		std::vector <std::string>	bufferForMenu;				// буфер меню
+		std::vector <TypeArray>		array;
+		std::list <TypeArray>		list;
+
+	private:															
+		Interface(const Interface&)					= delete;
+		Interface(const Interface&&)				= delete;
+		Interface& operator = (const Interface&)	= delete;
+		Interface& operator = (const Interface&&)	= delete;
 		void addToStatusBar(const std::string&& str, bool isFormated = true);
-
-	private:															// запрещаем создавать пустой класс
-
-		void generateMenu();															// генеригует меню
+		void generateMenu();					
+		void setActiveKey(Keys key);	
+		constexpr  std::string delimiter(char del = '=') const;				
 
 	public:
 		
@@ -42,14 +47,13 @@ namespace WORK {
 		constexpr size_t getMaxTableColumns()		const;					// возврат количества колонок "таблицы", при выводе данных массива и хеш-таблиц
 		constexpr size_t getMaxSize()				const;					// возврат количества колонок "таблицы", при выводе данных массива и хеш-таблиц
 
-		Keys getActiveKey()							const;					// возврат текущего кода клавиши
-		void setActiveKey(Keys key);										// задает код клавиши
-
 		constexpr void showHeader();										// выводит заголовок
 		constexpr void showMenu();											// выводит меню
 		void showStatusBar();												// выводит информацию из статус бара
+
+		Keys getActiveKey()							const;					// возврат текущего кода клавиши
+
 		void readKey();
-		constexpr  std::string delimiter(char del = '=') const;				// возврат разделителя
 
 
 		///
@@ -76,7 +80,15 @@ namespace WORK {
 
 template <class TypeArray>
 WORK::Interface<TypeArray>
-::Interface() {
+::Interface() 
+	: out						{	std::cout		}
+	, maxTableWidth				{	110				}
+	, maxTableColumnsInArray	{	5				}
+	, maxSize					{	12				}
+	, bufferForStatusBar		{					}
+	, activeKey					{ Keys::EmptyKey	}
+	, bufferForMenu				{					}
+{
 	generateMenu();
 }
 
