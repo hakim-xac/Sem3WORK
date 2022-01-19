@@ -14,6 +14,15 @@ namespace WORK {
 		, EmptyKey = -1
 	};
 
+	enum class StringFormat {
+		On
+		, Off
+	};
+
+	enum class EnableMenuDisplay {
+		On
+		, Off
+	};
 }
 
 
