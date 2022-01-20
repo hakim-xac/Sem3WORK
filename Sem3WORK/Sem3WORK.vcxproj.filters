@@ -23,7 +23,7 @@
     <ClInclude Include="enums.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="Interface.h">
+    <ClInclude Include="CommonInterface.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>

@@ -4,7 +4,6 @@
 #include <iostream>
 #include <type_traits>
 #include <vector>
-#include <list>
 #include <algorithm>
 #include "enums.h"
 
@@ -18,7 +17,7 @@ namespace WORK {
 	/// <typeparam name="TypeHashOpenAdressing">Тип массива, используемого для хранения чисел в качестве
 	///  хеш-таблицы используя метод открытой адрессации</typeparam>
 	template <class TypeArray>
-	class Interface
+	class CommonInterface
 	{
 		std::ostream& out;										// буфер вывода
 		size_t						maxTableWidth;				// ширина выводимой строки
@@ -28,13 +27,12 @@ namespace WORK {
 		Keys						activeKey;					// 
 		std::vector <std::string>	bufferForMenu;				// буфер меню
 		std::vector <TypeArray>		array;
-		std::list <TypeArray>		list;
 
 	private:															
-		Interface(const Interface&)					= delete;
-		Interface(const Interface&&)				= delete;
-		Interface& operator = (const Interface&)	= delete;
-		Interface& operator = (const Interface&&)	= delete;
+		CommonInterface(const CommonInterface&)					= delete;
+		CommonInterface(const CommonInterface&&)				= delete;
+		CommonInterface& operator = (const CommonInterface&)	= delete;
+		CommonInterface& operator = (const CommonInterface&&)	= delete;
 
 		void addToStatusBar(const std::string& str, StringFormat format = StringFormat::On);
 		void addToStatusBar(const std::string&& str, StringFormat format = StringFormat::On);
@@ -42,11 +40,8 @@ namespace WORK {
 		void setActiveKey(Keys key);	
 		constexpr  std::string delimiter(char del = '=') const;		
 
-		template<typename Iter>
-		void nameToContainer(Iter begin, Iter end);
-
-		template<typename Iter>
-		void printContainer(Iter begin, Iter end, EnableMenuDisplay emd = EnableMenuDisplay::On);
+		void nameToContainer();
+		void printContainer(EnableMenuDisplay emd = EnableMenuDisplay::On);
 
 
 
@@ -57,7 +52,7 @@ namespace WORK {
 
 	public:
 		
-		Interface();
+		CommonInterface();
 
 		constexpr size_t getMaxTableWidth()			const;					// возврат ширины максимальной длины используемой строки в приложении
 		constexpr size_t getMaxTableColumns()		const;					// возврат количества колонок "таблицы", при выводе данных массива и хеш-таблиц
@@ -86,11 +81,8 @@ namespace WORK {
 
 		/////////////////////
 
-		template<typename Iter>
-		std::pair<size_t, size_t> DirectSelectionSort(Iter begin, Iter end);
-
-		template<typename Iter>
-		std::pair<size_t, size_t> ShakerSort(Iter begin, Iter end);
+		std::pair<size_t, size_t> DirectSelectionSort();
+		std::pair<size_t, size_t> ShakerSort();
 	};
 }
 
@@ -104,44 +96,28 @@ namespace WORK {
 
 
 template <class TypeArray>
-template <class Iter>
-void WORK::Interface<TypeArray>
-::printContainer(Iter begin, Iter end, EnableMenuDisplay emd)
+WORK::CommonInterface<TypeArray>
+::CommonInterface()
+	: out							{	std::cout		}
+	, maxTableWidth					{	110				}
+	, maxTableColumnsInArray		{	5				}
+	, maxSize						{	12				}
+	, bufferForStatusBar			{					}
+	, activeKey						{	Keys::EmptyKey	}
+	, bufferForMenu					{					}
+	, array							(	maxSize			)
 {
-	if(emd == EnableMenuDisplay::On)	addToStatusBar("Вывод контейнера");
-
-	std::string result{};
-	auto lengthColumn{ (getMaxTableWidth() - 10) / getMaxTableColumns() };
-
-	for (auto it{ begin }, ite{ end }; it != ite; ++it) {
-		
-		std::string tmp(lengthColumn, ' ');
-		std::string num{ std::to_string(*it) };
-
-		size_t len{ static_cast<size_t>(std::distance(begin, it)) };
-		if ((len + 1) % getMaxTableColumns() != 0 && it != std::prev(ite)) {
-			tmp.replace(tmp.size() - 1, 1, "|");
-		}
-		tmp.replace((tmp.length() - num.length()) / 2, num.length(), num);
-		result += tmp;
-
-		if ((len + 1) % getMaxTableColumns() == 0 ) {
-			addToStatusBar(generatingStrings(result), StringFormat::Off);
-			addToStatusBar(delimiter('-'), StringFormat::Off);
-			result.clear();
-		}
-	}
-
-	if (!result.empty()) addToStatusBar(generatingStrings(" ", result), StringFormat::Off);
-
+	generateMenu();
 }
 
 
 template <class TypeArray>
-template <class Iter>
-void WORK::Interface<TypeArray>
-::nameToContainer(Iter begin, Iter end)
+void WORK::CommonInterface<TypeArray>
+::nameToContainer()
 {
+	auto begin	{	array.begin()	};
+	auto end	{	array.end()		};
+
 	srand(static_cast<TypeArray>(time(0)));
 
 	std::string name{"ХакимовАндрейСамигуллович"};
@@ -156,24 +132,7 @@ void WORK::Interface<TypeArray>
 
 
 template <class TypeArray>
-WORK::Interface<TypeArray>
-::Interface() 
-	: out						{	std::cout		}
-	, maxTableWidth				{	110				}
-	, maxTableColumnsInArray	{	5				}
-	, maxSize					{	12				}
-	, bufferForStatusBar		{					}
-	, activeKey					{	Keys::EmptyKey	}
-	, bufferForMenu				{					}
-	, array						(	maxSize			)
-	, list						(	maxSize			)
-{
-	generateMenu();
-}
-
-
-template <class TypeArray>
-void WORK::Interface<TypeArray>
+void WORK::CommonInterface<TypeArray>
 ::generateMenu()
 {
 	bufferForMenu.emplace_back(delimiter());
@@ -198,7 +157,7 @@ void WORK::Interface<TypeArray>
 
 
 template <class TypeArray>
-constexpr void WORK::Interface<TypeArray>
+constexpr void WORK::CommonInterface<TypeArray>
 ::showMenu()
 {
 	for (auto&& it : bufferForMenu)
@@ -209,7 +168,7 @@ constexpr void WORK::Interface<TypeArray>
 
 
 template <class TypeArray>
-constexpr size_t WORK::Interface<TypeArray>
+constexpr size_t WORK::CommonInterface<TypeArray>
 ::getMaxTableWidth() const
 {
 	return maxTableWidth;
@@ -217,7 +176,7 @@ constexpr size_t WORK::Interface<TypeArray>
 
 
 template <class TypeArray>
-constexpr size_t WORK::Interface<TypeArray>
+constexpr size_t WORK::CommonInterface<TypeArray>
 ::getMaxTableColumns() const
 {
 	return maxTableColumnsInArray;
@@ -225,7 +184,7 @@ constexpr size_t WORK::Interface<TypeArray>
 
 
 template <class TypeArray>
-constexpr size_t WORK::Interface<TypeArray>
+constexpr size_t WORK::CommonInterface<TypeArray>
 ::getMaxSize() const
 {
 	return maxSize;
@@ -233,7 +192,7 @@ constexpr size_t WORK::Interface<TypeArray>
 
 
 template <class TypeArray>
-WORK::Keys WORK::Interface<TypeArray>
+WORK::Keys WORK::CommonInterface<TypeArray>
 ::getActiveKey() const
 {
 	return activeKey;
@@ -241,7 +200,7 @@ WORK::Keys WORK::Interface<TypeArray>
 
 
 template <class TypeArray>
-void WORK::Interface<TypeArray>
+void WORK::CommonInterface<TypeArray>
 ::setActiveKey(Keys key)
 {
 	activeKey = key;
@@ -249,14 +208,14 @@ void WORK::Interface<TypeArray>
 
 
 template <class TypeArray>
-void WORK::Interface<TypeArray>
+void WORK::CommonInterface<TypeArray>
 ::addToStatusBar(const std::string& str, StringFormat format)
 {
 	addToStatusBar(std::move(str), format);
 }
 
 template <class TypeArray>
-void WORK::Interface<TypeArray>
+void WORK::CommonInterface<TypeArray>
 ::addToStatusBar(const std::string&& str, StringFormat format)
 {	
 	if (format == StringFormat::Off) {
@@ -275,7 +234,7 @@ void WORK::Interface<TypeArray>
 
 
 template <class TypeArray>
-constexpr void WORK::Interface<TypeArray>
+constexpr void WORK::CommonInterface<TypeArray>
 ::showHeader()
 {
 	std::string hr{ delimiter() };
@@ -289,7 +248,7 @@ constexpr void WORK::Interface<TypeArray>
 
 
 template <class TypeArray>
-void WORK::Interface<TypeArray>
+void WORK::CommonInterface<TypeArray>
 ::showStatusBar()
 {
 	std::string hr{ delimiter(' ') };
@@ -307,7 +266,7 @@ void WORK::Interface<TypeArray>
 
 
 template <class TypeArray>
-constexpr std::string WORK::Interface<TypeArray>
+constexpr std::string WORK::CommonInterface<TypeArray>
 ::delimiter(char del) const
 {
 	std::string result(maxTableWidth, del);
@@ -319,7 +278,7 @@ constexpr std::string WORK::Interface<TypeArray>
 
 
 template <class TypeArray>
-constexpr const std::string WORK::Interface<TypeArray>
+constexpr const std::string WORK::CommonInterface<TypeArray>
 ::generatingStrings(const std::string& inStr, char del) const
 {
 	return generatingStrings(std::move(inStr), del);
@@ -327,7 +286,7 @@ constexpr const std::string WORK::Interface<TypeArray>
 
 
 template <class TypeArray>
-constexpr const std::string WORK::Interface<TypeArray>
+constexpr const std::string WORK::CommonInterface<TypeArray>
 ::generatingStrings(const std::string&& inStr, char del) const
 {
 	if (inStr.empty()) return {};
@@ -352,7 +311,7 @@ constexpr const std::string WORK::Interface<TypeArray>
 
 
 template <class TypeArray>
-constexpr const std::string WORK::Interface<TypeArray>
+constexpr const std::string WORK::CommonInterface<TypeArray>
 ::generatingStrings(const std::string& inStr, const std::string& inStr2, char del) const
 {
 	return generatingStrings(std::move(inStr), std::move(inStr2), del);
@@ -360,7 +319,7 @@ constexpr const std::string WORK::Interface<TypeArray>
 
 
 template <class TypeArray>
-constexpr const std::string WORK::Interface<TypeArray>
+constexpr const std::string WORK::CommonInterface<TypeArray>
 ::generatingStrings(const std::string&& inStr, const std::string&& inStr2, char del) const
 {
 	if (inStr.empty() || inStr2.empty()) return {};
@@ -394,7 +353,7 @@ constexpr const std::string WORK::Interface<TypeArray>
 
 
 template<class TypeArray>
-void WORK::Interface<TypeArray>
+void WORK::CommonInterface<TypeArray>
 ::readKey()
 {
 
@@ -437,21 +396,22 @@ void WORK::Interface<TypeArray>
 
 
 template<class TypeArray>
-void WORK::Interface<TypeArray>
+void WORK::CommonInterface<TypeArray>
 ::showDirectSelectionSort()
 {
-	nameToContainer(array.begin(), array.end());
+	nameToContainer();
 	addToStatusBar("Вывод массива перед сортировкой");
-	printContainer(array.cbegin(), array.cend(), EnableMenuDisplay::Off);
+	printContainer(EnableMenuDisplay::Off);
 
-	auto [countOfComparisons, countOfShipments] = DirectSelectionSort(array.begin(), array.end());
+	auto [countOfComparisons, countOfShipments] = DirectSelectionSort();
 
 	addToStatusBar(delimiter(), StringFormat::Off);
 	addToStatusBar("Вывод массива после сортировки");
 	addToStatusBar(delimiter('-'), StringFormat::Off);
 	addToStatusBar(generatingStrings("Сортировка методом ПРЯМОГО ВЫБОРА"), StringFormat::Off);
 	addToStatusBar(delimiter('-'), StringFormat::Off);
-	printContainer(array.cbegin(), array.cend(), EnableMenuDisplay::Off);
+	printContainer(EnableMenuDisplay::Off);
+
 	addToStatusBar(delimiter('-'), StringFormat::Off);
 	addToStatusBar(generatingStrings("Количество сравнений", std::to_string(countOfComparisons)), StringFormat::Off);
 	addToStatusBar(delimiter('-'), StringFormat::Off);
@@ -462,11 +422,14 @@ void WORK::Interface<TypeArray>
 
 
 template <class TypeArray>
-template <class Iter>
-std::pair<size_t, size_t> WORK::Interface<TypeArray>
-::DirectSelectionSort(Iter begin, Iter end)
+std::pair<size_t, size_t> WORK::CommonInterface<TypeArray>
+::DirectSelectionSort()
 {
-	using value_type = typename Iter::value_type;
+
+	auto begin{ array.begin() };
+	auto end{ array.end() };
+	using value_type = TypeArray;
+	using Iter = decltype(array)::iterator;
 
 	size_t countOfComparisons{};
 	size_t countOfShipments{};
@@ -486,21 +449,22 @@ std::pair<size_t, size_t> WORK::Interface<TypeArray>
 
 
 template<class TypeArray>
-void WORK::Interface<TypeArray>
+void WORK::CommonInterface<TypeArray>
 ::showShakerSort()
 {
-	nameToContainer(array.begin(), array.end());
+	nameToContainer();
 	addToStatusBar("Вывод массива перед сортировкой");
-	printContainer(array.cbegin(), array.cend(), EnableMenuDisplay::Off);
+	printContainer(EnableMenuDisplay::Off);
 
-	auto [countOfComparisons, countOfShipments] = ShakerSort(array.begin(), array.end());
+	auto [countOfComparisons, countOfShipments] = ShakerSort();
 
 	addToStatusBar(delimiter(), StringFormat::Off);
 	addToStatusBar("Вывод массива после сортировки");
 	addToStatusBar(delimiter('-'), StringFormat::Off);
 	addToStatusBar(generatingStrings("Метод Шейкерной Сортировки"), StringFormat::Off);
 	addToStatusBar(delimiter('-'), StringFormat::Off);
-	printContainer(array.cbegin(), array.cend(), EnableMenuDisplay::Off);
+	printContainer(EnableMenuDisplay::Off);
+
 	addToStatusBar(delimiter('-'), StringFormat::Off);
 	addToStatusBar(generatingStrings("Количество сравнений", std::to_string(countOfComparisons)), StringFormat::Off);
 	addToStatusBar(delimiter('-'), StringFormat::Off);
@@ -511,11 +475,13 @@ void WORK::Interface<TypeArray>
 
 
 template <class TypeArray>
-template <class Iter>
-std::pair<size_t, size_t> WORK::Interface<TypeArray>
-::ShakerSort(Iter begin, Iter end)
+std::pair<size_t, size_t> WORK::CommonInterface<TypeArray>
+::ShakerSort()
 {
-	using value_type = typename Iter::value_type;
+	auto begin	{ array.begin() };
+	auto end	{ array.end()	};
+	using value_type = TypeArray;
+	using Iter = decltype(array)::iterator;
 
 	size_t countOfComparisonsAndShipments{};
 	
@@ -544,9 +510,45 @@ std::pair<size_t, size_t> WORK::Interface<TypeArray>
 }
 
 
+template <class TypeArray>
+void WORK::CommonInterface<TypeArray>
+::printContainer(EnableMenuDisplay emd)
+{
+
+	auto begin	{ array.begin() };
+	auto end	{ array.end()	};
+
+	if (emd == EnableMenuDisplay::On)	addToStatusBar("Вывод контейнера");
+
+	std::string result{};
+	auto lengthColumn{ (getMaxTableWidth() - 10) / getMaxTableColumns() };
+
+	for (auto it{ begin }, ite{ end }; it != ite; ++it) {
+
+		std::string tmp(lengthColumn, ' ');
+		std::string num{ std::to_string(*it) };
+
+		size_t len{ static_cast<size_t>(std::distance(begin, it)) };
+		if ((len + 1) % getMaxTableColumns() != 0 && it != std::prev(ite)) {
+			tmp.replace(tmp.size() - 1, 1, "|");
+		}
+		tmp.replace((tmp.length() - num.length()) / 2, num.length(), num);
+		result += tmp;
+
+		if ((len + 1) % getMaxTableColumns() == 0) {
+			addToStatusBar(generatingStrings(result), StringFormat::Off);
+			addToStatusBar(delimiter('-'), StringFormat::Off);
+			result.clear();
+		}
+	}
+
+	if (!result.empty()) addToStatusBar(generatingStrings(" ", result), StringFormat::Off);
+
+}
+
 
 template<class TypeArray>
-void WORK::Interface<TypeArray>
+void WORK::CommonInterface<TypeArray>
 ::test()
 {
 	nameToContainer(array.begin(), array.end());
