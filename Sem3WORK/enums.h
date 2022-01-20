@@ -23,6 +23,11 @@ namespace WORK {
 		On
 		, Off
 	};
+
+	enum class TypeSort {
+		DirectSelection
+		, Shake
+	};
 }
 
 
