@@ -2,7 +2,7 @@
 
 #include <iostream>
 #include "enums.h"
-#include "CommonInterface.h"
+#include "ContainerInterface.h"
 
 
 
@@ -13,7 +13,7 @@ int main()
     setlocale(LC_ALL, "Russian");                   // Задаем локаль
 
 
-    CommonInterface<int> window{};
+    ContainerInterface<int> window{};
 
 
     /* Запускаем бесконечный цикл ожидая ввод команды от пользователя  */
