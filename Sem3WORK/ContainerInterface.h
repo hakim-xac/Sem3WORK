@@ -1,7 +1,6 @@
 #pragma once
 
 #include <map>
-#include <functional>
 #include "CommonInterface.h"
 #include "enums.h"
 
@@ -10,9 +9,12 @@ namespace WORK {
 	template <class TypeContainer>
 	class ContainerInterface : public CommonInterface<TypeContainer>
 	{
+		using CommonInterface<TypeContainer>::setActiveKey;
+		using CommonInterface<TypeContainer>::getActiveKey;
 		using CommonInterface<TypeContainer>::addToStatusBar;
 		using CommonInterface<TypeContainer>::generatingStrings;
 		using CommonInterface<TypeContainer>::delimiter;
+		using CommonInterface<TypeContainer>::printErrorKey;
 
 		std::vector <TypeContainer>			array;
 		std::map<TypeSort, std::string> dataSortName;
@@ -28,24 +30,14 @@ namespace WORK {
 		void nameToContainer();
 		void printContainer(EnableMenuDisplay emd = EnableMenuDisplay::On);
 
-		void test();
-
 	public:
 		
 		ContainerInterface();
 
-		
-
 		void readKey();
 
-
-		///
-		/// генерирует строку согласно формату программы с 1 параметром
-		///
-		
-
-		std::tuple<size_t, size_t> DirectSelectionSort();
-		std::tuple<size_t, size_t> ShakerSort();
+		std::pair<size_t, size_t> DirectSelectionSort();
+		std::pair<size_t, size_t> ShakerSort();
 
 		void showSort(TypeSort tSort);
 	};
@@ -65,10 +57,52 @@ WORK::ContainerInterface<TypeContainer>
 ::ContainerInterface()
 	: CommonInterface<TypeContainer>()
 	, array							(	this->getMaxSize()			)
-	, dataSortName					{
-										{ TypeSort::DirectSelection, "Сортировка методом ПРЯМОГО ВЫБОРА" },
-										{ TypeSort::Shake, "Метод Шейкерной Сортировки" },
-									} {}
+	, dataSortName
+	{
+		{ TypeSort::DirectSelection,	"Сортировка методом ПРЯМОГО ВЫБОРА"		},
+		{ TypeSort::Shake,				"Метод Шейкерной Сортировки"			},
+	} {}
+
+
+
+template<class TypeContainer>
+void WORK::ContainerInterface<TypeContainer>
+::readKey()
+{
+
+	if (getActiveKey() == Keys::EmptyKey)
+	{
+		setActiveKey(static_cast<Keys>(std::cin.get()));	// Принимаем один символ
+		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Очищаем остальной буфер
+	}
+	switch (this->getActiveKey())
+	{
+	case Keys::Exit:							exit(0);								// Выход из цикла	
+		break;
+	case Keys::DirectSelectionSort:				showSort(TypeSort::DirectSelection);	// 1
+		break;
+	case Keys::ShakerSort:						showSort(TypeSort::Shake);				// 2
+		break;
+	case Keys::ShellSorting:					showSort(TypeSort::DirectSelection);	// 3
+		break;
+	case Keys::Pyramid:									// 4
+		break;
+	case Keys::HoareSorting:							// 5
+		break;
+	case Keys::Merger:									// 6
+		break;
+	case Keys::DigitalSorting:							// 7
+		break;
+	case Keys::QuickSearchBegin:						// 8
+		break;
+	case Keys::QuickSearchEnd:							// 9
+		break;
+	default:
+		printErrorKey();								// любая клавиша отсутствующая в перечислении Keys
+		break;
+	}
+	setActiveKey(Keys::EmptyKey);
+}
 
 
 template <class TypeContainer>
@@ -128,53 +162,8 @@ void WORK::ContainerInterface<TypeContainer>
 }
 
 
-
-template<class TypeContainer>
-void WORK::ContainerInterface<TypeContainer>
-::readKey()
-{
-
-	if (this->getActiveKey() == Keys::EmptyKey)
-	{
-		this->setActiveKey(static_cast<Keys>(std::cin.get()));	// Принимаем один символ
-		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Очищаем остальной буфер
-	}
-	switch (this->getActiveKey())
-	{
-	case Keys::Exit:                                    // 0
-		exit(0);                                        // Выход из цикла
-		break;
-	case Keys::DirectSelectionSort:                     // 1
-		showSort(TypeSort::DirectSelection);
-		break;
-	case Keys::ShakerSort:								// 2
-		showSort(TypeSort::Shake);
-		break;
-	case Keys::ShellSorting:							// 3
-		showSort(TypeSort::DirectSelection);
-		break;
-	case Keys::Pyramid:									// 4
-		break;
-	case Keys::HoareSorting:							// 5
-		break;
-	case Keys::Merger:									// 6
-		break;
-	case Keys::DigitalSorting:							// 7
-		break;
-	case Keys::QuickSearchBegin:						// 8
-		break;
-	case Keys::QuickSearchEnd:							// 9
-		break;
-	default:
-		this->addToStatusBar("Введена не верная команда!", StringFormat::On);            // любая клавиша отсутствующая в перечислении Keys
-		break;
-	}
-	this->setActiveKey(Keys::EmptyKey);
-}
-
-
 template <class TypeContainer>
-std::tuple<size_t, size_t> WORK::ContainerInterface<TypeContainer>
+std::pair<size_t, size_t> WORK::ContainerInterface<TypeContainer>
 ::DirectSelectionSort()
 {
 
@@ -200,7 +189,7 @@ std::tuple<size_t, size_t> WORK::ContainerInterface<TypeContainer>
 
 
 template <class TypeContainer>
-std::tuple<size_t, size_t> WORK::ContainerInterface<TypeContainer>
+std::pair<size_t, size_t> WORK::ContainerInterface<TypeContainer>
 ::ShakerSort()
 {
 	auto begin{ array.begin() };
@@ -276,13 +265,3 @@ void WORK::ContainerInterface<TypeContainer>
 
 
 
-
-
-template<class TypeContainer>
-void WORK::ContainerInterface<TypeContainer>
-::test()
-{
-	nameToContainer(array.begin(), array.end());
-	printContainer(array.begin(), array.end());
-	
-}
