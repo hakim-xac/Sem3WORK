@@ -141,7 +141,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="CommonInterface.cpp" />
     <ClCompile Include="Sem3WORK.cpp" />
   </ItemGroup>
   <ItemGroup>
