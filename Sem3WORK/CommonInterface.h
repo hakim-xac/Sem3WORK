@@ -6,6 +6,7 @@
 #include <type_traits>
 #include <vector>
 #include <algorithm>
+#include <map>
 #include "enums.h"
 
 
@@ -13,28 +14,32 @@ namespace WORK {
 	template <typename TypeContainer>
 	class CommonInterface
 	{
-		std::ostream& out;											// буфер вывода
-		size_t							maxTableWidth;				// ширина выводимой строки
-		int								maxTableColumnsInArray;		// количество колонов при выводе массива
-		const size_t					maxSize;
-		std::queue <std::string>		bufferForStatusBar;			// очередь для статус бара
-		Keys							activeKey;					// 
-		std::vector <std::string>		bufferForMenu;				// буфер меню
-
+		std::ostream&						out;						// буфер вывода
+		size_t								maxTableWidth;				// ширина выводимой строки
+		int									maxTableColumnsInArray;		// количество колонов при выводе массива
+		const size_t						maxSize;
+		std::queue <std::string>			bufferForStatusBar;			// очередь для статус бара
+		Keys								activeKey;					// 
+		std::vector <std::string>			bufferForMenu;				// буфер меню
+		std::map<HeaderValue, std::string>	headerValue;
 	private:
+		CommonInterface(const CommonInterface&)					= delete;
+		CommonInterface(const CommonInterface&&)				= delete;
+		CommonInterface& operator = (const CommonInterface&)	= delete;
+		CommonInterface& operator = (const CommonInterface&&)	= delete;
+
 
 		void generateMenu();
 
 	public:
 
 		CommonInterface();
+		constexpr void printErrorKey();
 		void addToStatusBar(const std::string& str, StringFormat format = StringFormat::Off);
 		void addToStatusBar(const std::string&& str, StringFormat format = StringFormat::Off);
 		constexpr  std::string delimiter(char del = '=') const;
-		constexpr const std::string generatingStrings(const std::string& str, char del = ' ') const;
-		constexpr const std::string generatingStrings(const std::string&& str, char del = ' ') const;
-		constexpr const std::string generatingStrings(const std::string& str, const std::string& str2, char del = ' ') const;
-		constexpr const std::string generatingStrings(const std::string&& str, const std::string&& str2, char del = ' ') const;
+		constexpr const std::string generatingStrings(const std::string& str, const std::string& str2 = "", char del = ' ') const;
+		constexpr const std::string generatingStrings(const std::string&& str, const std::string&& str2 = "", char del = ' ') const;
 
 
 		constexpr void showHeader();										// выводит заголовок
@@ -72,6 +77,23 @@ WORK::CommonInterface<TypeContainer>
 	, bufferForStatusBar			{					}
 	, activeKey						{ Keys::EmptyKey	}
 	, bufferForMenu					{					}
+	, headerValue{
+		{	HeaderValue::groupName,				"Группа ПБ-11"						},
+		{	HeaderValue::WorkName,				"Контрольная работа"				},
+		{	HeaderValue::LastNameStudent,		"Хакимов А.С."						},
+		{	HeaderValue::FooterName,			"Нажмите на клавишу и нажмите ВВОД"	},
+		{	HeaderValue::KeyZeroName,			"Выход"														},
+		{	HeaderValue::KeyOneName,			"Выполнить вручную сортировку методом прямого выбора"		},
+		{	HeaderValue::KeyTwoName,			"Выполнить вручную шейкерную сортировку"					},
+		{	HeaderValue::KeyThreeName,			"Выполнить вручную сортировку методом Шелла"				},
+		{	HeaderValue::KeyFourName,			"Построить пирамиду"										},
+		{	HeaderValue::KeyFiveName,			"Метод прямого связывания"									},
+		{	HeaderValue::KeySixName,			"Слияние двух списков"										},
+		{	HeaderValue::KeySevenName,			"Выполнить вручную сортировку методом цифровой сортировки"	},
+		{	HeaderValue::KeyEightName,			"Выполнить вручную быстрый поиск Буквы А"					},
+		{	HeaderValue::KeyNineName,			"Выполнить вручную быстрый поиск Буквы Я"					},
+		{	HeaderValue::KeyErrorName,			"Введена не верная команда!"								}
+	}
 {
 	generateMenu();
 }
@@ -83,21 +105,21 @@ void WORK::CommonInterface<TypeContainer>
 {
 	bufferForMenu.emplace_back(delimiter());
 	bufferForMenu.emplace_back(delimiter(' '));
-	bufferForMenu.emplace_back(generatingStrings("Нажмите на клавишу и нажмите ВВОД"));
+	bufferForMenu.emplace_back(generatingStrings(headerValue.at(HeaderValue::FooterName)));
+	bufferForMenu.emplace_back(delimiter('_'));
 	bufferForMenu.emplace_back(delimiter('_'));
 	bufferForMenu.emplace_back(delimiter(' '));
-	bufferForMenu.emplace_back(generatingStrings("Ответы на решение заданий"));
-	bufferForMenu.emplace_back(delimiter('_'));
-	bufferForMenu.emplace_back(generatingStrings("( 1 )", "Выполнить вручную сортировку методом прямого выбора", '.'));
-	bufferForMenu.emplace_back(generatingStrings("( 2 )", "Выполнить вручную шейкерную сортировку", '.'));
-	bufferForMenu.emplace_back(generatingStrings("( 3 )", "Выполнить вручную сортировку методом Шелла", '.'));
-	bufferForMenu.emplace_back(generatingStrings("( 4 )", "Построить пирамиду", '.'));
-	bufferForMenu.emplace_back(generatingStrings("( 5 )", "метод прямого связывания", '.'));
-	bufferForMenu.emplace_back(generatingStrings("( 6 )", "Слияние двух списков", '.'));
-	bufferForMenu.emplace_back(generatingStrings("( 7 )", "Выполнить вручную сортировку методом цифровой сортировки", '.'));
-	bufferForMenu.emplace_back(generatingStrings("( 8 )", "Выполнить вручную быстрый поиск Буквы А", '.'));
-	bufferForMenu.emplace_back(generatingStrings("( 9 )", "Выполнить вручную быстрый поиск Буквы Я", '.'));
-	bufferForMenu.emplace_back(generatingStrings("( 0 )", "Выход", '.'));
+	bufferForMenu.emplace_back(generatingStrings("( 1 )", headerValue.at(HeaderValue::KeyOneName),		'.'));
+	bufferForMenu.emplace_back(generatingStrings("( 2 )", headerValue.at(HeaderValue::KeyTwoName),		'.'));
+	bufferForMenu.emplace_back(generatingStrings("( 3 )", headerValue.at(HeaderValue::KeyThreeName),	'.'));
+	bufferForMenu.emplace_back(generatingStrings("( 4 )", headerValue.at(HeaderValue::KeyFourName),		'.'));
+	bufferForMenu.emplace_back(generatingStrings("( 5 )", headerValue.at(HeaderValue::KeyFiveName),		'.'));
+	bufferForMenu.emplace_back(generatingStrings("( 6 )", headerValue.at(HeaderValue::KeySixName),		'.'));
+	bufferForMenu.emplace_back(generatingStrings("( 7 )", headerValue.at(HeaderValue::KeySevenName),	'.'));
+	bufferForMenu.emplace_back(generatingStrings("( 8 )", headerValue.at(HeaderValue::KeyEightName),	'.'));
+	bufferForMenu.emplace_back(generatingStrings("( 9 )", headerValue.at(HeaderValue::KeyNineName),		'.'));
+	bufferForMenu.emplace_back(generatingStrings("( 0 )", headerValue.at(HeaderValue::KeyZeroName),		'.'));
+	bufferForMenu.emplace_back(delimiter(' '));
 	bufferForMenu.emplace_back(delimiter());
 }
 
@@ -184,9 +206,9 @@ constexpr void WORK::CommonInterface<TypeContainer>
 	std::string hr{ delimiter() };
 
 	out << hr;
-	out << generatingStrings("Контрольная работа");
+	out << generatingStrings(headerValue.at(HeaderValue::WorkName));
 	out << delimiter('-');
-	out << generatingStrings("Группа ПБ-11", "Хакимов А.C.");
+	out << generatingStrings(headerValue.at(HeaderValue::groupName), headerValue.at(HeaderValue::LastNameStudent));
 	out << hr;
 }
 
@@ -223,78 +245,48 @@ constexpr std::string WORK::CommonInterface<TypeContainer>
 
 template <class TypeContainer>
 constexpr const std::string WORK::CommonInterface<TypeContainer>
-::generatingStrings(const std::string& inStr, char del) const
+::generatingStrings(const std::string& str, const std::string& str2, char del) const
 {
-	return generatingStrings(std::move(inStr), del);
+	return generatingStrings(std::move(str), std::move(str2), del);
 }
 
 
 template <class TypeContainer>
 constexpr const std::string WORK::CommonInterface<TypeContainer>
-::generatingStrings(const std::string&& inStr, char del) const
+::generatingStrings(const std::string&& str, const std::string&& str2, char del) const
 {
-	if (inStr.empty()) return {};
-
-	std::string str;
-	if constexpr (std::is_lvalue_reference_v<std::string>) str = inStr;
-	else str = std::move(inStr);
+	if (str.empty()) return {};
 
 	try {
-		int parity{ str.length() % 2 == 0 };
-		size_t middleSize{ maxTableWidth > (str.length() + 2) ? (maxTableWidth - str.length() - 2) / 2 : 0 };
+		if (str2.empty())		
+		{
+			int parity{ str.length() % 2 == 0 };
+			size_t middleSize{ maxTableWidth > (str.length() + 2) ? (maxTableWidth - str.length() - 2) / 2 : 0 };
 
-		std::string middle(middleSize - parity, del);
+			std::string middle(middleSize - parity, del);
 
-		return { "#" + middle + str + (parity ? " " : "") + middle + "#\n" };
+			return { "#" + middle + str + (parity ? " " : "") + middle + "#\n" };
+		}
+		else
+		{
+			size_t len{ str.length() + str2.length() + 11 };
+			size_t middleSize{ maxTableWidth > len ? maxTableWidth - len : 11 };
+			std::string middle(middleSize, del);
+
+			return { "#    " + str + middle + str2 + "    #\n" };
+		}
 	}
 	catch (const std::exception& ex) {
-		std::cout << ex.what();
-		return {};
+		return ex.what();
 	}
 }
 
 
 template <class TypeContainer>
-constexpr const std::string WORK::CommonInterface<TypeContainer>
-::generatingStrings(const std::string& inStr, const std::string& inStr2, char del) const
+constexpr void WORK::CommonInterface<TypeContainer>
+::printErrorKey()
 {
-	return generatingStrings(std::move(inStr), std::move(inStr2), del);
+	addToStatusBar(headerValue.at(HeaderValue::KeyErrorName), StringFormat::On);
 }
-
-
-template <class TypeContainer>
-constexpr const std::string WORK::CommonInterface<TypeContainer>
-::generatingStrings(const std::string&& inStr, const std::string&& inStr2, char del) const
-{
-	if (inStr.empty() || inStr2.empty()) return {};
-
-	std::string str;
-	std::string str2;
-	if constexpr (std::is_lvalue_reference_v<std::string>)
-	{
-		str = inStr;
-		str2 = inStr2;
-	}
-	else
-	{
-		str = std::move(inStr);
-		str2 = std::move(inStr2);
-	}
-
-	try {
-		size_t len{ str.length() + str2.length() + 11 };
-		size_t middleSize{ maxTableWidth > len ? maxTableWidth - len : 11 };
-		std::string middle(middleSize, del);
-
-		return { "#    " + str + middle + str2 + "    #\n" };
-	}
-	catch (const std::exception& ex) {
-		std::cout << ex.what();
-		return {};
-	}
-}
-
-
-
 
 

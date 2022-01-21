@@ -28,6 +28,24 @@ namespace WORK {
 		DirectSelection
 		, Shake
 	};
+
+	enum class HeaderValue {
+		WorkName
+		, groupName
+		, LastNameStudent
+		, FooterName
+		, KeyErrorName
+		, KeyZeroName
+		, KeyOneName
+		, KeyTwoName
+		, KeyThreeName
+		, KeyFourName
+		, KeyFiveName
+		, KeySixName
+		, KeySevenName
+		, KeyEightName
+		, KeyNineName
+	};
 }
 
 
