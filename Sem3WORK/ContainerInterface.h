@@ -1,6 +1,8 @@
 #pragma once
 
 #include <map>
+#include <algorithm>
+#include <iterator>
 #include "CommonInterface.h"
 #include "enums.h"
 
@@ -36,8 +38,10 @@ namespace WORK {
 
         void readKey();
 
-        std::pair<size_t, size_t> DirectSelectionSort();
-        std::pair<size_t, size_t> ShakerSort();
+        std::tuple<bool, size_t, size_t> directSelectionSort();
+        std::tuple<bool, size_t, size_t> shakerSort();
+        std::tuple<bool, size_t, size_t> shellSort();
+        std::tuple<bool, size_t, size_t> heapSort();
 
         void showSort(TypeSort tSort);
     };
@@ -56,11 +60,13 @@ template <class TypeContainer>
 WORK::ContainerInterface<TypeContainer>
 ::ContainerInterface()
     : CommonInterface<TypeContainer>()
-    , array							(	this->getMaxSize()			)
+    , array							(	this->getMaxSize()			            )
     , dataSortName
     {
         { TypeSort::DirectSelection,	"Сортировка методом ПРЯМОГО ВЫБОРА"		},
         { TypeSort::Shake,				"Метод Шейкерной Сортировки"			},
+        { TypeSort::Shell,				"Сортировка методом Шелла"		    	},
+        { TypeSort::Heap,				"Мотод Пирамидальной Сортировки"    	},
     } {}
 
 
@@ -83,9 +89,9 @@ void WORK::ContainerInterface<TypeContainer>
         break;
     case Keys::ShakerSort:						showSort(TypeSort::Shake);				// 2
         break;
-    case Keys::ShellSorting:					showSort(TypeSort::DirectSelection);	// 3
+    case Keys::ShellSorting:					showSort(TypeSort::Shell);	            // 3
         break;
-    case Keys::Pyramid:									// 4
+    case Keys::Heap:						    showSort(TypeSort::Heap);              // 4
         break;
     case Keys::HoareSorting:							// 5
         break;
@@ -162,9 +168,49 @@ void WORK::ContainerInterface<TypeContainer>
 }
 
 
+template<class TypeContainer>
+void WORK::ContainerInterface<TypeContainer>
+::showSort(TypeSort tSort)
+{
+    nameToContainer();
+    addToStatusBar("Вывод массива перед сортировкой", StringFormat::On);
+    printContainer(EnableMenuDisplay::Off);
+
+    size_t countOfComparisons{};
+    size_t countOfShipments{};
+    bool isVisibleCounts{};
+    switch (tSort) {
+    case TypeSort::DirectSelection:		std::tie(isVisibleCounts, countOfComparisons, countOfShipments) = directSelectionSort();	break;
+    case TypeSort::Shake:				std::tie(isVisibleCounts, countOfComparisons, countOfShipments) = shakerSort();				break;
+    case TypeSort::Shell:				std::tie(isVisibleCounts, countOfComparisons, countOfShipments) = shellSort();				break;
+    case TypeSort::Heap:				std::tie(isVisibleCounts, countOfComparisons, countOfShipments) = heapSort();				break;
+    default:
+        addToStatusBar("Метод сортировки не выбран!", StringFormat::On);
+        return;
+    }
+
+    addToStatusBar(delimiter());
+    addToStatusBar("Вывод массива после сортировки", StringFormat::On);
+    addToStatusBar(delimiter('-'));
+    addToStatusBar(generatingStrings(dataSortName.at(tSort)));
+    addToStatusBar(delimiter('-'));
+    printContainer(EnableMenuDisplay::Off);
+
+    if (isVisibleCounts)
+    {
+        addToStatusBar(delimiter('-'));
+        addToStatusBar(generatingStrings("Количество сравнений", std::to_string(countOfComparisons)));
+        addToStatusBar(delimiter('-'));
+        addToStatusBar(generatingStrings("Количество перестановок", std::to_string(countOfShipments)));
+        addToStatusBar(delimiter('-'));
+    }
+
+}
+
+
 template <class TypeContainer>
-std::pair<size_t, size_t> WORK::ContainerInterface<TypeContainer>
-::DirectSelectionSort()
+std::tuple<bool, size_t, size_t> WORK::ContainerInterface<TypeContainer>
+::directSelectionSort()
 {
 
     auto begin{ array.begin() };
@@ -184,13 +230,13 @@ std::pair<size_t, size_t> WORK::ContainerInterface<TypeContainer>
         std::iter_swap(it, min);
     }
     countOfShipments *= 3;
-    return { countOfComparisons, countOfShipments };
+    return { true, countOfComparisons, countOfShipments };
 }
 
 
 template <class TypeContainer>
-std::pair<size_t, size_t> WORK::ContainerInterface<TypeContainer>
-::ShakerSort()
+std::tuple<bool, size_t, size_t> WORK::ContainerInterface<TypeContainer>
+::shakerSort()
 {
     auto begin{ array.begin() };
     auto end{ array.end() };
@@ -225,43 +271,56 @@ std::pair<size_t, size_t> WORK::ContainerInterface<TypeContainer>
         --right;
     }
         
-    return { countOfComparisons, countOfShipments };
+    return { true, countOfComparisons, countOfShipments };
 }
 
 
 template<class TypeContainer>
-void WORK::ContainerInterface<TypeContainer>
-::showSort(TypeSort tSort)
+std::tuple<bool, size_t, size_t> WORK::ContainerInterface<TypeContainer>
+::shellSort()
 {
-    nameToContainer();
-    addToStatusBar("Вывод массива перед сортировкой", StringFormat::On);
-    printContainer(EnableMenuDisplay::Off);
-
+    
     size_t countOfComparisons{};
     size_t countOfShipments{};
 
-    switch(tSort) {
-    case TypeSort::DirectSelection:		std::tie(countOfComparisons, countOfShipments) = DirectSelectionSort();		break;
-    case TypeSort::Shake:				std::tie(countOfComparisons, countOfShipments) = ShakerSort();				break;
-    default: 
-        addToStatusBar("Метод сортировки не выбран!", StringFormat::On);
-        return;
+    for (size_t step{ array.size() >> 1}; step; step >>= 1)
+    {
+        for (size_t i{ step }, j{}; i < array.size(); ++i)
+        {
+            TypeContainer* tmp{ &array[i] };
+            for (j = i; j >= step; j -= step)
+            {
+                ++countOfComparisons;
+                if (*tmp < array[j - step]) array[j] = array[j - step];                
+                else break;
+            }
+            array[j] = *tmp;
+            ++countOfShipments;
+        }
     }
-
-    addToStatusBar(delimiter());
-    addToStatusBar("Вывод массива после сортировки", StringFormat::On);
-    addToStatusBar(delimiter('-'));
-    addToStatusBar(generatingStrings(dataSortName.at(tSort)));
-    addToStatusBar(delimiter('-'));
-    printContainer(EnableMenuDisplay::Off);
-
-    addToStatusBar(delimiter('-'));
-    addToStatusBar(generatingStrings("Количество сравнений", std::to_string(countOfComparisons)));
-    addToStatusBar(delimiter('-'));
-    addToStatusBar(generatingStrings("Количество перестановок", std::to_string(countOfShipments)));
-    addToStatusBar(delimiter('-'));
+    
+    return { true, countOfComparisons , countOfShipments  };
 
 }
 
 
+template<class TypeContainer>
+std::tuple<bool, size_t, size_t> WORK::ContainerInterface<TypeContainer>
+::heapSort()
+{
+    auto begin{ array.begin() };
+    auto end{ array.end() };
 
+   // for ()
+    {
+
+    }
+
+   // for ()
+    {
+
+    }
+
+
+    return { false, 0 , 0 };
+}
