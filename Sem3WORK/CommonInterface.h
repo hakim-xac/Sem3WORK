@@ -88,7 +88,7 @@ WORK::CommonInterface<TypeContainer>
         {	HeaderValue::KeyTwoName,			"Выполнить вручную шейкерную сортировку"					},
         {	HeaderValue::KeyThreeName,			"Выполнить вручную сортировку методом Шелла"				},
         {	HeaderValue::KeyFourName,			"Построить пирамиду"										},
-        {	HeaderValue::KeyFiveName,			"Метод прямого связывания"									},
+        {	HeaderValue::KeyFiveName,			"Сортировка методом Хоара"									},
         {	HeaderValue::KeySixName,			"Слияние двух списков"										},
         {	HeaderValue::KeySevenName,			"Выполнить вручную сортировку методом цифровой сортировки"	},
         {	HeaderValue::KeyEightName,			"Выполнить вручную быстрый поиск Буквы А"					},

@@ -29,6 +29,8 @@ namespace WORK {
         , Shake
         , Shell
         , Heap
+        , Hoare
+        , Merge
     };
 
     enum class HeaderValue {
