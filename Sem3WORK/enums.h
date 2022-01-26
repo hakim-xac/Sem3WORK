@@ -31,6 +31,7 @@ namespace WORK {
         , Heap
         , Hoare
         , Merge
+        , Digital
     };
 
     enum class HeaderValue {
@@ -49,6 +50,11 @@ namespace WORK {
         , KeySevenName
         , KeyEightName
         , KeyNineName
+    };
+
+    enum class FullName {
+        Full
+        , Random
     };
 }
 
