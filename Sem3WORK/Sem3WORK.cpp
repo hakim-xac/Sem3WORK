@@ -13,7 +13,7 @@ int main()
     setlocale(LC_ALL, "Russian");                   // Задаем локаль
 
 
-    ContainerInterface<int> window{};
+    ContainerInterface<char> window{};
 
 
     /* Запускаем бесконечный цикл ожидая ввод команды от пользователя  */

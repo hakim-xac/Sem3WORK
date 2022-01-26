@@ -31,6 +31,7 @@ namespace WORK {
         , Heap
         , Hoare
         , Merge
+        , Digital
     };
 
     enum class HeaderValue {
