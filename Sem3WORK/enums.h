@@ -51,6 +51,11 @@ namespace WORK {
         , KeyEightName
         , KeyNineName
     };
+
+    enum class FullName {
+        Full
+        , Random
+    };
 }
 
 
