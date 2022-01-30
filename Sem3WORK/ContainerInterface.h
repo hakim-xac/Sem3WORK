@@ -115,7 +115,7 @@ void WORK::ContainerInterface<TypeContainer>
     }
     switch (this->getActiveKey())
     {
-    case Keys::Exit:                            exit(0);								            // Выход из цикла	
+    case Keys::Exit:                            exit(0);                                            // Выход из цикла	
         break;
     case Keys::DirectSelectionSort:             showSort(TypeSort::DirectSelection);                // 1
         break;
@@ -136,7 +136,7 @@ void WORK::ContainerInterface<TypeContainer>
     case Keys::QuickSearchEnd:                  showQSort('Я');	                                    // 9
         break;
     default:
-        printErrorKey();								// любая клавиша отсутствующая в перечислении Keys
+        printErrorKey();                        // любая клавиша отсутствующая в перечислении Keys
         break;
     }
     setActiveKey(Keys::EmptyKey);
