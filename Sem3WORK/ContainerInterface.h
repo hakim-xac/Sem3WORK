@@ -21,6 +21,9 @@ namespace WORK {
         using CommonInterface<TypeContainer>::delimiter;
         using CommonInterface<TypeContainer>::printErrorKey;
         using CommonInterface<TypeContainer>::getMaxSize;
+
+
+        std::string                           fullNameString;
         std::string                           defaultString;
         std::vector<TypeContainer>            array;
 
@@ -39,7 +42,8 @@ namespace WORK {
         std::string arrayToString(const TmpContainer& array);
         std::string arrayToString();
         void resetArray();
-        std::vector<size_t> typeArrayToDecArray();
+        template<class Iter>
+        std::vector<size_t> typeArrayToDecArray(Iter begin, Iter end);
         template<class Type>
         void decArrayToTypeArray(const Type& arr);
     public:
@@ -71,8 +75,10 @@ namespace WORK {
         template <typename Type>
         Type digitalSort(Type& array);
         std::string initDigitalSort();
-        void showQSort(const std::string& elem);
-        bool quickSearch(const std::string& elem);
+        void showQSort(const TypeContainer& elem);
+        std::pair<bool, size_t> isQuickSearch(const TypeContainer& elem);
+        template <typename Iter>
+        std::pair<bool, size_t> quickSearch(Iter begin, Iter end, const TypeContainer& elem);
     };
 }
 
@@ -89,6 +95,7 @@ template <class TypeContainer>
 WORK::ContainerInterface<TypeContainer>
 ::ContainerInterface()
     : CommonInterface<TypeContainer>()
+    , fullNameString("ХАКИМОВАНДРЕЙСАМИГУЛЛОВИЧ")
     , defaultString("ХАКИМОВАНДРЕ")
     , array() {
     std::copy(defaultString.begin(), defaultString.end(), std::back_inserter(array));
@@ -123,9 +130,9 @@ void WORK::ContainerInterface<TypeContainer>
         break;
     case Keys::DigitalSorting:					showSort(TypeSort::Digital);                        // 7
         break;
-    case Keys::QuickSearchBegin:				showQSort("А");                                     // 8
+    case Keys::QuickSearchBegin:				showQSort('А');                                     // 8
         break;
-    case Keys::QuickSearchEnd:					showQSort("Я");	                                    // 9
+    case Keys::QuickSearchEnd:					showQSort('Я');	                                    // 9
         break;
     default:
         printErrorKey();								// любая клавиша отсутствующая в перечислении Keys
@@ -556,11 +563,12 @@ Type WORK::ContainerInterface<TypeContainer>
 
 
 template<class TypeContainer>
+template<class Iter>
 std::vector<size_t> WORK::ContainerInterface<TypeContainer>
-::typeArrayToDecArray()
+::typeArrayToDecArray(Iter begin, Iter end)
 {
     std::vector<size_t> result;
-    std::transform(array.begin(), array.end(), std::back_inserter(result), [](TypeContainer& elem) -> size_t {
+    std::transform(begin, end, std::back_inserter(result), [](TypeContainer& elem) -> size_t {
         return elem - 'А' + 1;
         });
     return result;
@@ -573,7 +581,7 @@ void WORK::ContainerInterface<TypeContainer>
 ::decArrayToTypeArray(const Type& arr)
 {
     std::transform(arr.begin(), arr.end(), std::back_inserter(array), [](size_t elem) -> TypeContainer {
-        return elem + 'А' - 1;
+        return static_cast<int>(elem) + 'А' - 1;
         });
 
 }
@@ -583,7 +591,7 @@ template<class TypeContainer>
 std::string WORK::ContainerInterface<TypeContainer>
 ::initDigitalSort()
 {
-    auto arr{ typeArrayToDecArray() };    
+    auto arr{ typeArrayToDecArray(array.begin(), array.end()) };
     auto arrayInTernary{ std::move(fromToTernarySystem(arr.begin(), arr.end(), 10, 3)) };
     auto arraySorted{ std::move(digitalSort(arrayInTernary)) };
     auto arrayInDec{ fromToTernarySystem(arraySorted.begin(), arraySorted.end(), 3, 10) };
@@ -597,22 +605,50 @@ std::string WORK::ContainerInterface<TypeContainer>
 
 
 template<class TypeContainer>
-bool WORK::ContainerInterface<TypeContainer>
-::quickSearch(const std::string& elem)
+void WORK::ContainerInterface<TypeContainer>
+::showQSort(const TypeContainer& elem)
 {
-    return false;
+    addToStatusBar("Быстрый поиск", StringFormat::On);
+    addToStatusBar(generatingStrings("Поиск в строке", fullNameString));
+    addToStatusBar(delimiter('-'));
+    addToStatusBar(generatingStrings("Поисковый запрос", std::string() + elem));
+    auto [isFind, countOfComparisons] = isQuickSearch(elem);
+    std::string find{ isFind ? "Найдено" : "НЕ найдено" };
+    addToStatusBar(delimiter('-'));
+    addToStatusBar(generatingStrings("Результат поиска", find));
+    addToStatusBar(delimiter('-'));
+    addToStatusBar(generatingStrings("Количество сравнений", std::to_string(countOfComparisons)));
+    addToStatusBar(delimiter('-'));
 }
 
 
 template<class TypeContainer>
-void WORK::ContainerInterface<TypeContainer>
-::showQSort(const std::string& elem)
+std::pair<bool, size_t> WORK::ContainerInterface<TypeContainer>
+::isQuickSearch(const TypeContainer& elem)
 {
-    addToStatusBar("Быстрый поиск", StringFormat::On);
-    addToStatusBar(generatingStrings("Поисковый запрос", elem));
-    std::string find{ quickSearch(elem) ? "Найдено" : "НЕ найдено"};
-    addToStatusBar(delimiter('-'));
-    addToStatusBar(generatingStrings("Результат поиска", find));
-    addToStatusBar(delimiter('-'));
+    std::string copyFullName{ fullNameString };
+    hoare(copyFullName.data(), 0, copyFullName.size() - 1);
+    return quickSearch(copyFullName.begin(), copyFullName.end(), elem);
+}
+
+
+template<class TypeContainer>
+template<class Iter>
+std::pair<bool, size_t> WORK::ContainerInterface<TypeContainer>
+::quickSearch(Iter begin, Iter end, const TypeContainer& elem)
+{
+    Iter left{ begin };
+    Iter right{ end };
+    size_t countOfComparisons{};
+    while (std::distance(left, right) > 0)
+    {
+        auto distance = std::distance(left, right);
+        Iter middle{ left + (distance / 2) };
+        if (*middle == elem) return { true, countOfComparisons };
+        if (*middle < elem) left = middle + 1;
+        else right = middle - 1;
+        ++countOfComparisons;
+    }
+    return { false, countOfComparisons };
 }
 
