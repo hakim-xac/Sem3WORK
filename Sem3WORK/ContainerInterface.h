@@ -29,23 +29,24 @@ namespace WORK {
 
     private:	
         
-        ContainerInterface(const ContainerInterface&)				= delete;
-        ContainerInterface(const ContainerInterface&&)				= delete;
-        ContainerInterface& operator = (const ContainerInterface&)	= delete;
-        ContainerInterface& operator = (const ContainerInterface&&)	= delete;
+        ContainerInterface(const ContainerInterface&)               = delete;
+        ContainerInterface(const ContainerInterface&&)              = delete;
+        ContainerInterface& operator = (const ContainerInterface&)  = delete;
+        ContainerInterface& operator = (const ContainerInterface&&) = delete;
         
         std::vector<TypeContainer> nameToContainer();
         template <typename Iter>
-        void printContainer(Iter begin, Iter end, EnableMenuDisplay emd = EnableMenuDisplay::On);
+        void        printContainer(Iter begin, Iter end, EnableMenuDisplay emd = EnableMenuDisplay::On);
         std::string getDefaultString();
         template <typename TmpContainer>
         std::string arrayToString(const TmpContainer& array);
         std::string arrayToString();
-        void resetArray();
+        void        resetArray();
+
         template<class Iter>
         std::vector<size_t> typeArrayToDecArray(Iter begin, Iter end);
         template<class Type>
-        void decArrayToTypeArray(const Type& arr);
+        void                decArrayToTypeArray(const Type& arr);
     public:
         
         ContainerInterface();
@@ -59,26 +60,26 @@ namespace WORK {
         std::tuple<bool, size_t, size_t, std::string> shakerSort();
         std::tuple<bool, size_t, size_t, std::string> shellSort();
 
-        std::string makeHeap();
+        std::string                 makeHeap();
 
         template <typename Iter>
-        void pushHeap(Iter begin, Iter end);
+        void                        pushHeap(Iter begin, Iter end);
 
-        std::string hoareSort();
-        void hoare(TypeContainer* data, size_t begin, size_t end);
+        std::string                 hoareSort();
+        void                        hoare(TypeContainer* data, size_t begin, size_t end);
 
-        void showMerge();
+        void                        showMerge();
         template <typename Iter>
-        std::list<TypeContainer> merge(Iter first, Iter last, Iter first2, Iter last2);
+        std::list<TypeContainer>    merge(Iter first, Iter last, Iter first2, Iter last2);
         template <typename Iter>
-        std::vector<size_t> fromToTernarySystem(Iter begin, Iter end, size_t from, size_t to);
+        std::vector<size_t>         fromToTernarySystem(Iter begin, Iter end, size_t from, size_t to);
         template <typename Type>
-        Type digitalSort(Type& array);
-        std::string initDigitalSort();
-        void showQSort(const TypeContainer& elem);
-        std::pair<bool, size_t> isQuickSearch(const TypeContainer& elem);
+        Type                        digitalSort(Type& array);
+        std::string                 initDigitalSort();
+        void                        showQSort(const TypeContainer& elem);
+        std::pair<bool, size_t>     isQuickSearch(const TypeContainer& elem);
         template <typename Iter>
-        std::pair<bool, size_t> quickSearch(Iter begin, Iter end, const TypeContainer& elem);
+        std::pair<bool, size_t>     quickSearch(Iter begin, Iter end, const TypeContainer& elem);
     };
 }
 
