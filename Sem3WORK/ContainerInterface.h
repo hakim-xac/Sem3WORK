@@ -35,6 +35,13 @@ namespace WORK {
         template <typename Iter>
         void printContainer(Iter begin, Iter end, EnableMenuDisplay emd = EnableMenuDisplay::On);
         std::string getDefaultString();
+        template <typename TmpContainer>
+        std::string arrayToString(const TmpContainer& array);
+        std::string arrayToString();
+        void resetArray();
+        std::vector<size_t> typeArrayToDecArray();
+        template<class Type>
+        void decArrayToTypeArray(const Type& arr);
     public:
         
         ContainerInterface();
@@ -42,35 +49,30 @@ namespace WORK {
         void readKey();
         void showSort(TypeSort tSort);
 
-        template <typename Iter>
-        std::tuple<bool, size_t, size_t, std::string> selectAction(Iter begin, Iter end, TypeSort tSort);
+        std::tuple<bool, size_t, size_t, std::string> selectAction(TypeSort tSort);
 
-        template <typename Iter>
-        std::tuple<bool, size_t, size_t, std::string> directSelectionSort(Iter begin, Iter end);
-        template <typename Iter>
-        std::tuple<bool, size_t, size_t, std::string> shakerSort(Iter begin, Iter end);
-        template <typename Iter>
-        std::tuple<bool, size_t, size_t, std::string> shellSort(Iter begin, Iter end);
+        std::tuple<bool, size_t, size_t, std::string> directSelectionSort();
+        std::tuple<bool, size_t, size_t, std::string> shakerSort();
+        std::tuple<bool, size_t, size_t, std::string> shellSort();
 
-        template <typename Iter>
-        std::string makeHeap(Iter begin, Iter end);
+        std::string makeHeap();
+
         template <typename Iter>
         void pushHeap(Iter begin, Iter end);
 
-        template <typename Iter>
-        std::string hoareSort(Iter begin, Iter end);
+        std::string hoareSort();
         void hoare(TypeContainer* data, size_t begin, size_t end);
 
         void showMerge();
         template <typename Iter>
         std::list<TypeContainer> merge(Iter first, Iter last, Iter first2, Iter last2);
-
-
-        void arrayEncodeToTernarySystem();
-        void arrayDecodeToTernarySystem();
-        void digitalSort();
         template <typename Iter>
-        void initDigitalSort(Iter begin, Iter end);
+        std::vector<size_t> fromToTernarySystem(Iter begin, Iter end, size_t from, size_t to);
+        template <typename Type>
+        Type digitalSort(Type& array);
+        std::string initDigitalSort();
+        void showQSort(const std::string& elem);
+        bool quickSearch(const std::string& elem);
     };
 }
 
@@ -88,7 +90,7 @@ WORK::ContainerInterface<TypeContainer>
 ::ContainerInterface()
     : CommonInterface<TypeContainer>()
     , defaultString("ХАКИМОВАНДРЕ")
-    , array(getMaxSize()) {
+    , array() {
     std::copy(defaultString.begin(), defaultString.end(), std::back_inserter(array));
 }
 
@@ -107,23 +109,23 @@ void WORK::ContainerInterface<TypeContainer>
     {
     case Keys::Exit:							exit(0);								            // Выход из цикла	
         break;
-    case Keys::DirectSelectionSort:				showSort(TypeSort::DirectSelection);	            // 1
+    case Keys::DirectSelectionSort:				showSort(TypeSort::DirectSelection);                // 1
         break;
-    case Keys::ShakerSort:						showSort(TypeSort::Shake);				            // 2
+    case Keys::ShakerSort:						showSort(TypeSort::Shake);                          // 2
         break;
-    case Keys::ShellSorting:					showSort(TypeSort::Shell);	                        // 3
+    case Keys::ShellSorting:					showSort(TypeSort::Shell);                          // 3
         break;
     case Keys::Heap:						    showSort(TypeSort::Heap);                           // 4
         break;
-    case Keys::HoareSorting:					showSort(TypeSort::Hoare);  	                    // 5
+    case Keys::HoareSorting:					showSort(TypeSort::Hoare);                          // 5
         break;
     case Keys::Merger:							showMerge();                                        // 6
         break;
     case Keys::DigitalSorting:					showSort(TypeSort::Digital);                        // 7
         break;
-    case Keys::QuickSearchBegin:						// 8
+    case Keys::QuickSearchBegin:				showQSort("А");                                     // 8
         break;
-    case Keys::QuickSearchEnd:							// 9
+    case Keys::QuickSearchEnd:					showQSort("Я");	                                    // 9
         break;
     default:
         printErrorKey();								// любая клавиша отсутствующая в перечислении Keys
@@ -134,10 +136,40 @@ void WORK::ContainerInterface<TypeContainer>
 
 
 template <class TypeContainer>
+void WORK::ContainerInterface<TypeContainer>
+::resetArray()
+{
+    array.clear();
+    std::copy(defaultString.begin(), defaultString.end(), std::back_inserter(array));
+}
+
+
+template <class TypeContainer>
 std::string WORK::ContainerInterface<TypeContainer>
 ::getDefaultString()
 {
     return defaultString;
+}
+
+
+template <class TypeContainer>
+std::string WORK::ContainerInterface<TypeContainer>
+::arrayToString()
+{
+    std::string result;
+    std::copy(array.begin(), array.end(), std::back_inserter(result));
+    return result;
+}
+
+
+template <class TypeContainer>
+template <class TmpContainer>
+std::string WORK::ContainerInterface<TypeContainer>
+::arrayToString(const TmpContainer& array)
+{
+    std::string result;
+    std::move(array.begin(), array.end(), std::back_inserter(result));
+    return result;
 }
 
 
@@ -195,26 +227,26 @@ void WORK::ContainerInterface<TypeContainer>
 
 
 template<class TypeContainer>
-template<class Iter>
 std::tuple<bool, size_t, size_t, std::string> WORK::ContainerInterface<TypeContainer>
-::selectAction(Iter begin, Iter end, TypeSort tSort)
+::selectAction(TypeSort tSort)
 {
 
     size_t countOfComparisons{};
     size_t countOfShipments{};
     bool isVisibleCounts{};
     std::string stringResult{};
+    resetArray();
     switch (tSort) {
-    case TypeSort::DirectSelection:		std::tie(isVisibleCounts, countOfComparisons, countOfShipments, stringResult) = directSelectionSort(begin, end);	break;
-    case TypeSort::Shake:				std::tie(isVisibleCounts, countOfComparisons, countOfShipments, stringResult) = shakerSort(begin, end);				break;
-    case TypeSort::Shell:				std::tie(isVisibleCounts, countOfComparisons, countOfShipments, stringResult) = shellSort(begin, end);				break;
-    case TypeSort::Heap:				                                                                 stringResult = makeHeap(begin, end);				break;
-    case TypeSort::Hoare:				                                                                 stringResult = hoareSort(begin, end);				break;
-    case TypeSort::Digital:				                                                                  initDigitalSort(begin, end);		break;
+    case TypeSort::DirectSelection:		std::tie(isVisibleCounts, countOfComparisons, countOfShipments, stringResult) = directSelectionSort();	break;
+    case TypeSort::Shake:				std::tie(isVisibleCounts, countOfComparisons, countOfShipments, stringResult) = shakerSort();			break;
+    case TypeSort::Shell:				std::tie(isVisibleCounts, countOfComparisons, countOfShipments, stringResult) = shellSort();			break;
+    case TypeSort::Heap:				                                                                 stringResult = makeHeap();				break;
+    case TypeSort::Hoare:				                                                                 stringResult = hoareSort();			break;
+    case TypeSort::Digital:				                                                                 stringResult = initDigitalSort();		break;
     default:
         addToStatusBar("Метод сортировки не выбран!", StringFormat::On);
     }
-    return { isVisibleCounts, countOfComparisons, countOfShipments, std::move(stringResult) };
+    return { isVisibleCounts, countOfComparisons, countOfShipments, stringResult };
 }
 
 
@@ -222,8 +254,7 @@ template<class TypeContainer>
 void WORK::ContainerInterface<TypeContainer>
 ::showSort(TypeSort tSort)
 {
-    std::string str{ getDefaultString() };
-    auto [isVisibleCounts, countOfComparisons, countOfShipments, headerSort] = selectAction(str.begin(), str.end(), tSort);
+    auto [isVisibleCounts, countOfComparisons, countOfShipments, headerSort] = selectAction(tSort);
 
     addToStatusBar(headerSort, StringFormat::On);
     addToStatusBar(delimiter('-'));
@@ -232,8 +263,7 @@ void WORK::ContainerInterface<TypeContainer>
     addToStatusBar(delimiter(' '));
     addToStatusBar(delimiter('-'));
     addToStatusBar(delimiter(' '));
-
-    addToStatusBar(generatingStrings("Строка после операции", str));
+    addToStatusBar(generatingStrings("Строка после операции", arrayToString()));
     addToStatusBar(delimiter(' '));
     addToStatusBar(delimiter('-'));
   
@@ -249,14 +279,17 @@ void WORK::ContainerInterface<TypeContainer>
 
 
 template <class TypeContainer>
-template <class Iter>
 std::tuple<bool, size_t, size_t, std::string> WORK::ContainerInterface<TypeContainer>
-::directSelectionSort(Iter begin, Iter end)
+::directSelectionSort()
 {
+
+    auto begin{ array.begin() };
+    auto end{ array.end() };
+    using Iter = decltype(array)::iterator;
 
     size_t countOfComparisons{};
     size_t countOfShipments{};
-    Iter min{ begin  };
+    Iter min{ array.begin() };
     for (auto it{ begin }, ite{ end }; it != ite; ++it) {
         min = it;
         countOfShipments += 3;
@@ -272,16 +305,16 @@ std::tuple<bool, size_t, size_t, std::string> WORK::ContainerInterface<TypeConta
 
 
 template <class TypeContainer>
-template <class Iter>
 std::tuple<bool, size_t, size_t, std::string> WORK::ContainerInterface<TypeContainer>
-::shakerSort(Iter begin, Iter end)
+::shakerSort()
 {
+    using Iter = decltype(array)::iterator;
 
-    size_t countOfComparisons   {       };
-    size_t countOfShipments     {       };
+    size_t countOfComparisons   {               };
+    size_t countOfShipments     {               };
 
-    Iter left				    { begin };
-    Iter right				    { end   };
+    Iter left				    { array.begin() };
+    Iter right				    { array.end()   };
 
     while (left != right)
     {
@@ -311,11 +344,9 @@ std::tuple<bool, size_t, size_t, std::string> WORK::ContainerInterface<TypeConta
 
 
 template<class TypeContainer>
-template<class Iter>
 std::tuple<bool, size_t, size_t, std::string> WORK::ContainerInterface<TypeContainer>
-::shellSort(Iter begin, Iter end)                                                   //////////////////////////////                
+::shellSort()                                                   //////////////////////////////                
 {
-    printContainer(array.begin(), array.end());
     size_t countOfComparisons{};
     size_t countOfShipments{};
 
@@ -323,14 +354,14 @@ std::tuple<bool, size_t, size_t, std::string> WORK::ContainerInterface<TypeConta
     {
         for (size_t i{ step }, j{}; i < array.size(); ++i)
         {
-            TypeContainer* tmp{ &array[i] };
+            TypeContainer tmp{ array[i] };
             for (j = i; j >= step; j -= step)
             {
                 ++countOfComparisons;
-                if (*tmp < array[j - step]) array[j] = array[j - step];                
+                if (tmp < array[j - step]) array[j] = array[j - step];                
                 else break;
             }
-            array[j] = *tmp;
+            array[j] = tmp;
             ++countOfShipments;
         }
     }
@@ -357,10 +388,12 @@ void WORK::ContainerInterface<TypeContainer>
 
 
 template<class TypeContainer>
-template<class Iter>
 std::string WORK::ContainerInterface<TypeContainer>
-::makeHeap(Iter begin, Iter end)
+::makeHeap()
 {    
+    auto begin{ array.begin() };
+    auto end{ array.begin() };
+
     for (auto it{ begin }; it != end; )
     {
         pushHeap(begin, ++it);
@@ -382,7 +415,7 @@ void WORK::ContainerInterface<TypeContainer>
     }
 
     auto i{ begin }, j{ end };
-    int x{ data[(begin + end) / 2] };
+    int x{ data[(begin + end - 1) / 2] };
 
     while (i <= j)
     {        
@@ -400,12 +433,10 @@ void WORK::ContainerInterface<TypeContainer>
 
 
 template<typename TypeContainer>
-template<typename Iter>
 std::string WORK::ContainerInterface<TypeContainer>
-::hoareSort(Iter begin, Iter end)
+::hoareSort()
 {
-    auto length{ std::distance(begin, end) };
-    hoare(&*begin, 0, length);   
+    hoare(array.data(), 0, array.size() - 1);
     return "Сортировка методом Хоара";
 }
 
@@ -463,59 +494,41 @@ void WORK::ContainerInterface<TypeContainer>
 
 
 template<class TypeContainer>
-inline void WORK::ContainerInterface<TypeContainer>
-::arrayEncodeToTernarySystem()
+template<class Iter>
+inline std::vector<size_t> WORK::ContainerInterface<TypeContainer>
+::fromToTernarySystem(Iter begin, Iter end, size_t from, size_t to)
 {
-    auto array{ nameToContainer() };
-    std::vector<TypeContainer> buf;
-    for (auto&& it : array)
+    
+    std::vector<size_t> result;
+    for (auto it{ begin }, ite{ end }; it != ite; ++it)
     {
-        TypeContainer tmp{};
-        for (auto pow{ 1 }; it; pow *= 10, it /= 3)
+        size_t tmp{};
+        for (size_t pow{ 1 }; *it; pow *= from, *it /= to)
         {
-            tmp += (it % 3) * pow;
+            tmp += (*it % to) * pow;
         }
-        buf.emplace_back(tmp);
+        result.emplace_back(tmp);
     }
-    array.clear();
-    std::move(buf.begin(), buf.end(), std::back_inserter(array));
+    return result;
 }
 
 
 template<class TypeContainer>
-inline void WORK::ContainerInterface<TypeContainer>
-::arrayDecodeToTernarySystem()
+template<class Type>
+Type WORK::ContainerInterface<TypeContainer>
+::digitalSort(Type& array)
 {
-    auto array{ nameToContainer() };
-    std::vector<TypeContainer> buf;
-    for (auto&& it : array)
-    {
-        TypeContainer tmp{};
-        for (auto pow{ 1 }; it; pow *= 3, it /= 10)
-        {
-            tmp += (it % 10) * pow;
-        }
-        buf.emplace_back(tmp);
-    }
-    array.clear();
-    std::move(buf.begin(), buf.end(), std::back_inserter(array));
-}
+    auto begin{ array.begin() };
+    auto end{ array.end() };
+    std::vector<std::list<size_t>> base(3);    
 
-
-template<class TypeContainer>
-void WORK::ContainerInterface<TypeContainer>
-::digitalSort()
-{
-    auto array{ nameToContainer() };
-    std::vector<std::list<TypeContainer>> base(3);    
-
-    for (auto maxElem{ *std::max_element(array.begin(), array.end()) }; maxElem; maxElem /= 10)
+    for (auto maxElem{ *std::max_element(begin, end) }; maxElem; maxElem /= 10)
     {
         for (int i{}, step{ 1 }; i < base.size(); ++i, step *= 10)
         {
-            for (auto&& it : array)
+            for (auto&& it: array)
             {
-                auto tmp_it{ it };
+                size_t tmp_it{ it };
                 tmp_it /= step;
                 auto n{ tmp_it % 10 };
                 if (n > 2)
@@ -523,73 +536,83 @@ void WORK::ContainerInterface<TypeContainer>
                     addToStatusBar("Формат массива не задан!", StringFormat::On);
                     addToStatusBar("Числа должны быть в троичной системе счисления!", StringFormat::On);
                     array.clear();
-                    return;
+                    return Type();
                 }
                 base.at(n).push_back(it);
             }
             array.clear();
-            std::move(base.at(0).begin(), base.at(0).end(), std::back_inserter(array));
-            std::move(base.at(1).begin(), base.at(1).end(), std::back_inserter(array));
-            std::move(base.at(2).begin(), base.at(2).end(), std::back_inserter(array));
+            std::copy(base.at(0).begin(), base.at(0).end(), std::back_inserter(array));
+            std::copy(base.at(1).begin(), base.at(1).end(), std::back_inserter(array));
+            std::copy(base.at(2).begin(), base.at(2).end(), std::back_inserter(array));
             base.at(0).clear();
             base.at(1).clear();
             base.at(2).clear();
         }
     }
+    Type result;
+    std::move(array.begin(), array.end(), std::back_inserter(result));
+    return result;
 }
 
 
 template<class TypeContainer>
-template<class Iter>
-void WORK::ContainerInterface<TypeContainer>
-::initDigitalSort(Iter begin, Iter end)
+std::vector<size_t> WORK::ContainerInterface<TypeContainer>
+::typeArrayToDecArray()
 {
-    auto array{ nameToContainer() };
-    //nameToContainer();
-    decltype(array) tmp( array.size() );
-    std::copy(array.begin(), array.end(), std::back_inserter(tmp));
-    //std::string oldName{ arrayToString () };
-    //std::cout << "\n\narrayToString : " << oldName << " \n\n";
-    std::cout << "\narray before digitalSort: \n";
-    for (auto&& it : array)
-    {
-        std::cout << "n:" << it << "\n";
-    }
-    arrayEncodeToTernarySystem();
-    digitalSort();
-    arrayDecodeToTernarySystem();
-    //std::cout << "\n\narrayToString : " << arrayToString() << " \n\n";
-    std::cout << "array after digitalSort: \n";
-    for (auto&& it : array)
-    {
-        std::cout << "n:" << it << "\n";
-    }
-/*******************************************************************************************************************/
+    std::vector<size_t> result;
+    std::transform(array.begin(), array.end(), std::back_inserter(result), [](TypeContainer& elem) -> size_t {
+        return elem - 'А' + 1;
+        });
+    return result;
+}
+
+
+template<class TypeContainer>
+template<class Type>
+void WORK::ContainerInterface<TypeContainer>
+::decArrayToTypeArray(const Type& arr)
+{
+    std::transform(arr.begin(), arr.end(), std::back_inserter(array), [](size_t elem) -> TypeContainer {
+        return elem + 'А' - 1;
+        });
+
+}
+
+
+template<class TypeContainer>
+std::string WORK::ContainerInterface<TypeContainer>
+::initDigitalSort()
+{
+    auto arr{ typeArrayToDecArray() };    
+    auto arrayInTernary{ std::move(fromToTernarySystem(arr.begin(), arr.end(), 10, 3)) };
+    auto arraySorted{ std::move(digitalSort(arrayInTernary)) };
+    auto arrayInDec{ fromToTernarySystem(arraySorted.begin(), arraySorted.end(), 3, 10) };
+
+    printContainer(arrayInDec.begin(), arrayInDec.end());
     array.clear();
-    std::copy(tmp.begin(), tmp.end(), std::back_inserter(array));
-    //std::string newName{ arrayToString() };
-    std::cout << ("\n*************************************************************\n");
-    std::cout << ("\n*************************************************************\n");
-    std::cout << ("\n*************************************************************\n");
 
-    //std::cout << "\n\narrayToString : " << newName << " \n\n";
-    std::cout << "\narray before digitalSort: \n";
-    for (auto&& it : array)
-    {
-        std::cout << "n:" << it << "\n";
-    }
+    decArrayToTypeArray(arrayInDec);
+    return "Метод цифровой сортировки";
+}
 
-    std::sort(array.begin(), array.end());
 
-   // std::cout << "\n\narrayToString : " << arrayToString() << " \n\n";
-    std::cout << "array after sort: \n";
-    for (auto&& it : array)
-    {
-        std::cout << "n:" << it << "\n";
-    }
+template<class TypeContainer>
+bool WORK::ContainerInterface<TypeContainer>
+::quickSearch(const std::string& elem)
+{
+    return false;
+}
 
-    //std::cout << "\nbool string:" << ( oldName == newName) << "\n";
-    system("pause");
-    
+
+template<class TypeContainer>
+void WORK::ContainerInterface<TypeContainer>
+::showQSort(const std::string& elem)
+{
+    addToStatusBar("Быстрый поиск", StringFormat::On);
+    addToStatusBar(generatingStrings("Поисковый запрос", elem));
+    std::string find{ quickSearch(elem) ? "Найдено" : "НЕ найдено"};
+    addToStatusBar(delimiter('-'));
+    addToStatusBar(generatingStrings("Результат поиска", find));
+    addToStatusBar(delimiter('-'));
 }
 
