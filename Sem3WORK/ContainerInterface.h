@@ -245,7 +245,7 @@ std::tuple<bool, size_t, size_t, std::string> WORK::ContainerInterface<TypeConta
     std::string stringResult{};
     resetArray();
     switch (tSort) {
-    case TypeSort::DirectSelection:		std::tie(isVisibleCounts, countOfComparisons, countOfShipments, stringResult) = directSelectionSort();  break;
+    case TypeSort::DirectSelection:     std::tie(isVisibleCounts, countOfComparisons, countOfShipments, stringResult) = directSelectionSort();  break;
     case TypeSort::Shake:				std::tie(isVisibleCounts, countOfComparisons, countOfShipments, stringResult) = shakerSort();           break;
     case TypeSort::Shell:				std::tie(isVisibleCounts, countOfComparisons, countOfShipments, stringResult) = shellSort();            break;
     case TypeSort::Heap:				                                                                 stringResult = makeHeap();             break;
