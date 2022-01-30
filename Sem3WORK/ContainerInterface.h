@@ -29,23 +29,24 @@ namespace WORK {
 
     private:	
         
-        ContainerInterface(const ContainerInterface&)				= delete;
-        ContainerInterface(const ContainerInterface&&)				= delete;
-        ContainerInterface& operator = (const ContainerInterface&)	= delete;
-        ContainerInterface& operator = (const ContainerInterface&&)	= delete;
+        ContainerInterface(const ContainerInterface&)               = delete;
+        ContainerInterface(const ContainerInterface&&)              = delete;
+        ContainerInterface& operator = (const ContainerInterface&)  = delete;
+        ContainerInterface& operator = (const ContainerInterface&&) = delete;
         
         std::vector<TypeContainer> nameToContainer();
         template <typename Iter>
-        void printContainer(Iter begin, Iter end, EnableMenuDisplay emd = EnableMenuDisplay::On);
+        void        printContainer(Iter begin, Iter end, EnableMenuDisplay emd = EnableMenuDisplay::On);
         std::string getDefaultString();
         template <typename TmpContainer>
         std::string arrayToString(const TmpContainer& array);
         std::string arrayToString();
-        void resetArray();
+        void        resetArray();
+
         template<class Iter>
         std::vector<size_t> typeArrayToDecArray(Iter begin, Iter end);
         template<class Type>
-        void decArrayToTypeArray(const Type& arr);
+        void                decArrayToTypeArray(const Type& arr);
     public:
         
         ContainerInterface();
@@ -59,26 +60,26 @@ namespace WORK {
         std::tuple<bool, size_t, size_t, std::string> shakerSort();
         std::tuple<bool, size_t, size_t, std::string> shellSort();
 
-        std::string makeHeap();
+        std::string                 makeHeap();
 
         template <typename Iter>
-        void pushHeap(Iter begin, Iter end);
+        void                        pushHeap(Iter begin, Iter end);
 
-        std::string hoareSort();
-        void hoare(TypeContainer* data, size_t begin, size_t end);
+        std::string                 hoareSort();
+        void                        hoare(TypeContainer* data, size_t begin, size_t end);
 
-        void showMerge();
+        void                        showMerge();
         template <typename Iter>
-        std::list<TypeContainer> merge(Iter first, Iter last, Iter first2, Iter last2);
+        std::list<TypeContainer>    merge(Iter first, Iter last, Iter first2, Iter last2);
         template <typename Iter>
-        std::vector<size_t> fromToTernarySystem(Iter begin, Iter end, size_t from, size_t to);
+        std::vector<size_t>         fromToTernarySystem(Iter begin, Iter end, size_t from, size_t to);
         template <typename Type>
-        Type digitalSort(Type& array);
-        std::string initDigitalSort();
-        void showQSort(const TypeContainer& elem);
-        std::pair<bool, size_t> isQuickSearch(const TypeContainer& elem);
+        Type                        digitalSort(Type& array);
+        std::string                 initDigitalSort();
+        void                        showQSort(const TypeContainer& elem);
+        std::pair<bool, size_t>     isQuickSearch(const TypeContainer& elem);
         template <typename Iter>
-        std::pair<bool, size_t> quickSearch(Iter begin, Iter end, const TypeContainer& elem);
+        std::pair<bool, size_t>     quickSearch(Iter begin, Iter end, const TypeContainer& elem);
     };
 }
 
@@ -114,25 +115,25 @@ void WORK::ContainerInterface<TypeContainer>
     }
     switch (this->getActiveKey())
     {
-    case Keys::Exit:							exit(0);								            // Выход из цикла	
+    case Keys::Exit:                            exit(0);								            // Выход из цикла	
         break;
-    case Keys::DirectSelectionSort:				showSort(TypeSort::DirectSelection);                // 1
+    case Keys::DirectSelectionSort:             showSort(TypeSort::DirectSelection);                // 1
         break;
-    case Keys::ShakerSort:						showSort(TypeSort::Shake);                          // 2
+    case Keys::ShakerSort:                      showSort(TypeSort::Shake);                          // 2
         break;
-    case Keys::ShellSorting:					showSort(TypeSort::Shell);                          // 3
+    case Keys::ShellSorting:                    showSort(TypeSort::Shell);                          // 3
         break;
-    case Keys::Heap:						    showSort(TypeSort::Heap);                           // 4
+    case Keys::Heap:                            showSort(TypeSort::Heap);                           // 4
         break;
-    case Keys::HoareSorting:					showSort(TypeSort::Hoare);                          // 5
+    case Keys::HoareSorting:                    showSort(TypeSort::Hoare);                          // 5
         break;
-    case Keys::Merger:							showMerge();                                        // 6
+    case Keys::Merger:                          showMerge();                                        // 6
         break;
-    case Keys::DigitalSorting:					showSort(TypeSort::Digital);                        // 7
+    case Keys::DigitalSorting:                  showSort(TypeSort::Digital);                        // 7
         break;
-    case Keys::QuickSearchBegin:				showQSort('А');                                     // 8
+    case Keys::QuickSearchBegin:                showQSort('А');                                     // 8
         break;
-    case Keys::QuickSearchEnd:					showQSort('Я');	                                    // 9
+    case Keys::QuickSearchEnd:                  showQSort('Я');	                                    // 9
         break;
     default:
         printErrorKey();								// любая клавиша отсутствующая в перечислении Keys
@@ -244,12 +245,12 @@ std::tuple<bool, size_t, size_t, std::string> WORK::ContainerInterface<TypeConta
     std::string stringResult{};
     resetArray();
     switch (tSort) {
-    case TypeSort::DirectSelection:		std::tie(isVisibleCounts, countOfComparisons, countOfShipments, stringResult) = directSelectionSort();	break;
-    case TypeSort::Shake:				std::tie(isVisibleCounts, countOfComparisons, countOfShipments, stringResult) = shakerSort();			break;
-    case TypeSort::Shell:				std::tie(isVisibleCounts, countOfComparisons, countOfShipments, stringResult) = shellSort();			break;
-    case TypeSort::Heap:				                                                                 stringResult = makeHeap();				break;
-    case TypeSort::Hoare:				                                                                 stringResult = hoareSort();			break;
-    case TypeSort::Digital:				                                                                 stringResult = initDigitalSort();		break;
+    case TypeSort::DirectSelection:		std::tie(isVisibleCounts, countOfComparisons, countOfShipments, stringResult) = directSelectionSort();  break;
+    case TypeSort::Shake:				std::tie(isVisibleCounts, countOfComparisons, countOfShipments, stringResult) = shakerSort();           break;
+    case TypeSort::Shell:				std::tie(isVisibleCounts, countOfComparisons, countOfShipments, stringResult) = shellSort();            break;
+    case TypeSort::Heap:				                                                                 stringResult = makeHeap();             break;
+    case TypeSort::Hoare:				                                                                 stringResult = hoareSort();            break;
+    case TypeSort::Digital:				                                                                 stringResult = initDigitalSort();      break;
     default:
         addToStatusBar("Метод сортировки не выбран!", StringFormat::On);
     }
