@@ -14,18 +14,33 @@ namespace WORK {
     template <class TypeContainer>
     class ContainerInterface : public CommonInterface<TypeContainer>
     {
-        using CommonInterface<TypeContainer>::setActiveKey;
+        /// <summary>
+        ///                         Задает интерфейс и функции-члены необходимые для выполнения заданий по условию КР
+        /// </summary>
+        
+        /*
+        * создаем алиасы из базового класса
+        */
+        using CommonInterface<TypeContainer>::setActiveKey;                 
         using CommonInterface<TypeContainer>::getActiveKey;
         using CommonInterface<TypeContainer>::addToStatusBar;
         using CommonInterface<TypeContainer>::generatingStrings;
         using CommonInterface<TypeContainer>::delimiter;
         using CommonInterface<TypeContainer>::printErrorKey;
-        using CommonInterface<TypeContainer>::getMaxSize;
+        using CommonInterface<TypeContainer>::getMaxLengthString;
 
-
-        std::string                           fullNameString;
-        std::string                           defaultString;
-        std::vector<TypeContainer>            array;
+        /*
+        * необходимые поля для решения
+        */
+        const size_t						  maxLengthString;  // длина строки, требуемая по условию КР
+        std::string                           firstName;        // Имя
+        std::string                           lastName;         // Фамилия
+        std::string                           middleName;       // Имя
+        std::string                           fullNameString;   // Полное ФИО для 8-го задания КР.
+        std::string                           defaultString;    // Набор символов ФИО. Столько, сколько необходимо по условию (12 символов) 
+        char                                  firstLetter;      // первый символ имени
+        char                                  secondLetter;     // символ Я
+        std::vector<TypeContainer>            array;            // Массив для реализации некоторых алгоритмов
 
     private:	
         
@@ -34,52 +49,69 @@ namespace WORK {
         ContainerInterface& operator = (const ContainerInterface&)  = delete;
         ContainerInterface& operator = (const ContainerInterface&&) = delete;
         
-        std::vector<TypeContainer> nameToContainer();
+        /// <summary>
+        /// Распечатывает в поток контейнер.
+        /// </summary>
+        /// <typeparam name="Iter">Тип итератора</typeparam>
+        /// <param name="begin">итератор на первый элемент</param>
+        /// <param name="end">итератор на следующий после последнего элемента</param>
+        /// <param name="emd">enum EnableMenuDisplay - вкл. заголовок на вывод</param>
         template <typename Iter>
         void        printContainer(Iter begin, Iter end, EnableMenuDisplay emd = EnableMenuDisplay::On);
+
         std::string getDefaultString();
+        // Преобразует массив в строку
         template <typename TmpContainer>
         std::string arrayToString(const TmpContainer& array);
         std::string arrayToString();
+        /// <summary>
+        /// сбрасывает в дефолтное состояние
+        /// </summary>
         void        resetArray();
-
+        /// <summary>
+        /// Преобразует массив с типами в массив size_t
+        /// </summary>
         template<class Iter>
         std::vector<size_t> typeArrayToDecArray(Iter begin, Iter end);
+
+        /// <summary>
+        /// Преобразует массив с Type в массив типа TypeContainer
+        /// </summary>
         template<class Type>
         void                decArrayToTypeArray(const Type& arr);
     public:
         
         ContainerInterface();
 
-        void readKey();
-        void showSort(TypeSort tSort);
+        void readKey();                 // бесконечный цикл, идет считывание клавиши и идет обработка команды
+        void showSort(TypeSort tSort);  // общий интерфейс сортировки
 
-        std::tuple<bool, size_t, size_t, std::string> selectAction(TypeSort tSort);
+        std::tuple<bool, size_t, size_t, std::string> selectAction(TypeSort tSort); // выбирает сортировку в зависимости от TypeSort
 
-        std::tuple<bool, size_t, size_t, std::string> directSelectionSort();
-        std::tuple<bool, size_t, size_t, std::string> shakerSort();
-        std::tuple<bool, size_t, size_t, std::string> shellSort();
+        std::tuple<bool, size_t, size_t, std::string> directSelectionSort();        // сортировка методом прямого выбора
+        std::tuple<bool, size_t, size_t, std::string> shakerSort();                 // шейкерная сортировка
+        std::tuple<bool, size_t, size_t, std::string> shellSort();                  // сортировка методом шелла
 
-        std::string                 makeHeap();
+        std::string                 makeHeap();                                     // вспомагательная функция для построения пирамиды
 
         template <typename Iter>
-        void                        pushHeap(Iter begin, Iter end);
+        void                        pushHeap(Iter begin, Iter end);                 // строит пирамиду
 
-        std::string                 hoareSort();
-        void                        hoare(TypeContainer* data, size_t begin, size_t end);
+        std::string                 hoareSort();                                            // вспомагательная функция для сортировки методом Хоара
+        void                        hoare(TypeContainer* data, size_t begin, size_t end);   // сортировка методом Хоара
 
-        void                        showMerge();
+        void                        showMerge();                                            // интерфейс сортировки слиянием
         template <typename Iter>
-        std::list<TypeContainer>    merge(Iter first, Iter last, Iter first2, Iter last2);
+        std::list<TypeContainer>    merge(Iter first, Iter last, Iter first2, Iter last2);  // сортировка слиянием
         template <typename Iter>
-        std::vector<size_t>         fromToTernarySystem(Iter begin, Iter end, size_t from, size_t to);
+        std::vector<size_t>         fromToTernarySystem(Iter begin, Iter end, size_t from, size_t to);  // переводит контейнер из "from" СС в "to" СС 
         template <typename Type>
-        Type                        digitalSort(Type& array);
-        std::string                 initDigitalSort();
-        void                        showQSort(const TypeContainer& elem);
-        std::pair<bool, size_t>     isQuickSearch(const TypeContainer& elem);
+        Type                        digitalSort(Type& array);                               // цифровая сортировка
+        std::string                 initDigitalSort();                                      // интерфейс цифровой сортировки
+        void                        showQSearch(const TypeContainer& elem);                 // интерфейс быстрого поиска
+        std::pair<bool, size_t>     isQuickSearch(const TypeContainer& elem);               // вспомагательная функция быстрого поиска
         template <typename Iter>
-        std::pair<bool, size_t>     quickSearch(Iter begin, Iter end, const TypeContainer& elem);
+        std::pair<bool, size_t>     quickSearch(Iter begin, Iter end, const TypeContainer& elem); // быстрый поиск
     };
 }
 
@@ -88,7 +120,7 @@ namespace WORK {
 /***************************************************************************************************************************/
 /***************************************************************************************************************************/
 /***************************************************************************************************************************/
-                                                /* Определение методов */
+                                                /* Определение функций-членов класса */
 
 
 
@@ -96,10 +128,16 @@ template <class TypeContainer>
 WORK::ContainerInterface<TypeContainer>
 ::ContainerInterface()
     : CommonInterface<TypeContainer>()
-    , fullNameString("ХАКИМОВАНДРЕЙСАМИГУЛЛОВИЧ")
-    , defaultString("ХАКИМОВАНДРЕ")
+    , maxLengthString{ 12 }                 /*********----- НЕ БОЛЬШЕ ДЛИНЫ ФИО и НЕ МЕНЬШЕ 2, ИНАЧЕ UB ---***************/ // на данный момент это 12
+    , firstName("АНДРЕЙ")                   // ЗАПОЛНИТЬ --- ИМЯ
+    , lastName("ХАКИМОВ")                   // ЗАПОЛНИТЬ --- ФАМИЛИЯ
+    , middleName("САМИГУЛЛОВИЧ")            // ЗАПОЛНИТЬ --- ОТЧЕСТВО
+    , fullNameString(lastName + firstName + middleName)
+    , defaultString(fullNameString.substr(0, maxLengthString))
+    , firstLetter(firstName[0])
+    , secondLetter('Я')
     , array() {
-    std::copy(defaultString.begin(), defaultString.end(), std::back_inserter(array));
+    std::copy(defaultString.begin(), defaultString.begin() + maxLengthString, std::back_inserter(array));
 }
 
 
@@ -131,9 +169,9 @@ void WORK::ContainerInterface<TypeContainer>
         break;
     case Keys::DigitalSorting:                  showSort(TypeSort::Digital);                        // 7
         break;
-    case Keys::QuickSearchBegin:                showQSort('А');                                     // 8
+    case Keys::QuickSearchBegin:                showQSearch(firstLetter);                           // 8
         break;
-    case Keys::QuickSearchEnd:                  showQSort('Я');	                                    // 9
+    case Keys::QuickSearchEnd:                  showQSearch(secondLetter);	                        // 9
         break;
     default:
         printErrorKey();                        // любая клавиша отсутствующая в перечислении Keys
@@ -177,25 +215,6 @@ std::string WORK::ContainerInterface<TypeContainer>
 {
     std::string result;
     std::move(array.begin(), array.end(), std::back_inserter(result));
-    return result;
-}
-
-
-    template <class TypeContainer>
-    std::vector<TypeContainer> WORK::ContainerInterface<TypeContainer>
-        ::nameToContainer()
-    {
-    std::vector<TypeContainer> result(getMaxSize());
-    auto begin	{ result.begin()	};
-    auto end	{ result.end()		};
-    const std::string name{ defaultString };
-    size_t count{};
-    std::generate(begin, end, [&name, &count]() {
-        int item{};
-        item = name[count++] - 'А';        
-        if (item > 32) item -= 32;
-        return ++item;
-        });
     return result;
 }
 
@@ -344,6 +363,7 @@ std::tuple<bool, size_t, size_t, std::string> WORK::ContainerInterface<TypeConta
                 ++countOfShipments;
             }
         }
+        if (left == right) break;
         --right;
     }
         
@@ -400,9 +420,8 @@ std::string WORK::ContainerInterface<TypeContainer>
 ::makeHeap()
 {    
     auto begin{ array.begin() };
-    auto end{ array.begin() };
 
-    for (auto it{ begin }; it != end; )
+    for (auto it{ begin }; it != array.end(); )
     {
         pushHeap(begin, ++it);
     }   
@@ -480,21 +499,18 @@ template<typename TypeContainer>
 void WORK::ContainerInterface<TypeContainer>
 ::showMerge()
 {
-    std::string lastName{"хакимов"};
-    std::string name{"андрей"};
-
-
-    std::list<TypeContainer> lst{ merge(lastName.begin(), lastName.end(), name.begin(), name.end()) };
+    std::list<TypeContainer> lst{ merge(lastName.begin(), lastName.end(), firstName.begin(), firstName.end()) };
 
     std::string result;
     std::copy(lst.begin(), lst.end(), std::back_inserter(result));
     addToStatusBar("Сортировка слиянием", StringFormat::On);
     addToStatusBar(generatingStrings("первый список", "\"" + lastName + "\""));
     addToStatusBar(delimiter('-'));
-    addToStatusBar(generatingStrings("второй список", "\"" + name + "\""));
+    addToStatusBar(generatingStrings("второй список", "\"" + firstName + "\""));
 
     addToStatusBar(delimiter('-'));
     addToStatusBar(generatingStrings("результатирующий список", "\"" + result + "\""));
+    addToStatusBar(delimiter('-'));
 
 
 
@@ -607,7 +623,7 @@ std::string WORK::ContainerInterface<TypeContainer>
 
 template<class TypeContainer>
 void WORK::ContainerInterface<TypeContainer>
-::showQSort(const TypeContainer& elem)
+::showQSearch(const TypeContainer& elem)
 {
     addToStatusBar("Быстрый поиск", StringFormat::On);
     addToStatusBar(generatingStrings("Поиск в строке", fullNameString));

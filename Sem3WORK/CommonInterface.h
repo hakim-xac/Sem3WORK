@@ -11,13 +11,15 @@
 
 
 namespace WORK {
+    /// <summary>
+    ///                                     Общий интерфейс программы
+    /// </summary>
     template <typename TypeContainer>
     class CommonInterface
     {
         std::ostream&						out;						// буфер вывода
         size_t								maxTableWidth;				// ширина выводимой строки
         int									maxTableColumnsInArray;		// количество колонов при выводе массива
-        const size_t						maxSize;
         std::queue <std::string>			bufferForStatusBar;			// очередь для статус бара
         Keys								activeKey;					// 
         std::vector <std::string>			bufferForMenu;				// буфер меню
@@ -39,7 +41,7 @@ namespace WORK {
         void						addToStatusBar(const std::string& str, StringFormat format = StringFormat::Off);
         void						addToStatusBar(const std::string&& str, StringFormat format = StringFormat::Off);
         constexpr  std::string		delimiter(char del = '=') const;
-        constexpr const std::string generatingStrings(const std::string& str, const std::string& str2 = "", char del = ' ') const;
+        constexpr const std::string generatingStrings(const std::string& str, const std::string& str2 = "", char del = ' ')   const;
         constexpr const std::string generatingStrings(const std::string&& str, const std::string&& str2 = "", char del = ' ') const;
 
 
@@ -51,7 +53,7 @@ namespace WORK {
 
         constexpr size_t getMaxTableWidth()			const;					// возврат ширины максимальной длины используемой строки в приложении
         constexpr size_t getMaxTableColumns()		const;					// возврат количества колонок "таблицы", при выводе данных массива и хеш-таблиц
-        constexpr size_t getMaxSize()				const;					// возврат количества колонок "таблицы", при выводе данных массива и хеш-таблиц
+        constexpr size_t getMaxLengthString()	    const;			        // возврат количества колонок "таблицы", при выводе данных массива и хеш-таблиц
 
         Keys getActiveKey()							const;					// возврат текущего кода клавиши
         void setActiveKey(Keys key);
@@ -64,7 +66,7 @@ namespace WORK {
 /***************************************************************************************************************************/
 /***************************************************************************************************************************/
 /***************************************************************************************************************************/
-                                                /* Определение методов */
+                                                /* Определение функций-членов класса */
 
 
 
@@ -74,7 +76,6 @@ WORK::CommonInterface<TypeContainer>
     : out							{ std::cout			}
     , maxTableWidth					{ 110				}
     , maxTableColumnsInArray		{ 5					}
-    , maxSize						{ 12				}
     , bufferForStatusBar			{					}
     , activeKey						{ Keys::EmptyKey	}
     , bufferForMenu					{					}
@@ -91,7 +92,7 @@ WORK::CommonInterface<TypeContainer>
         {	HeaderValue::KeyFiveName,			"Сортировка методом Хоара"									},
         {	HeaderValue::KeySixName,			"Слияние двух списков"										},
         {	HeaderValue::KeySevenName,			"Выполнить вручную сортировку методом цифровой сортировки"	},
-        {	HeaderValue::KeyEightName,			"Выполнить вручную быстрый поиск Буквы А"					},
+        {	HeaderValue::KeyEightName,			"Выполнить вручную быстрый поиск Первой буквы имени"		},
         {	HeaderValue::KeyNineName,			"Выполнить вручную быстрый поиск Буквы Я"					},
         {	HeaderValue::KeyErrorName,			"Введена не верная команда!"								}
     }
@@ -146,14 +147,6 @@ constexpr size_t WORK::CommonInterface<TypeContainer>
 ::getMaxTableColumns() const
 {
     return maxTableColumnsInArray;
-}
-
-
-template <class TypeContainer>
-constexpr size_t WORK::CommonInterface<TypeContainer>
-::getMaxSize() const
-{
-    return maxSize;
 }
 
 

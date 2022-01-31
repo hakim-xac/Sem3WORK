@@ -14,17 +14,17 @@ namespace WORK {
         , EmptyKey = -1
     };
 
-    enum class StringFormat {
+    enum class StringFormat {                           // ‘лаг форматировани€ строки
         On
         , Off
     };
 
-    enum class EnableMenuDisplay {
+    enum class EnableMenuDisplay {                      // ‘лаг отображени€ заголовка
         On
         , Off
     };
 
-    enum class TypeSort {
+    enum class TypeSort {                               // ѕеречислени€ используемых сортировок
         DirectSelection
         , Shake
         , Shell
@@ -34,7 +34,7 @@ namespace WORK {
         , Digital
     };
 
-    enum class HeaderValue {
+    enum class HeaderValue {                            // вспомогательное перечисление, дл€ хранени€ std::string в std::map
         WorkName
         , groupName
         , LastNameStudent
