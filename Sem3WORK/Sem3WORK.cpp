@@ -18,7 +18,7 @@ int main()
 {
     using namespace WORK;                           // Подключаем пространство имен нашей программы
 
-    setWindow(111, 70);
+    setWindow(111, 300);
     setlocale(LC_ALL, "Russian");                   // Задаем локаль
 
 
