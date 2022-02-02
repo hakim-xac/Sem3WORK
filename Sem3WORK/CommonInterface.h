@@ -41,6 +41,8 @@ namespace WORK {
         void						addToStatusBar(const std::string& str, StringFormat format = StringFormat::Off);
         void						addToStatusBar(const std::string&& str, StringFormat format = StringFormat::Off);
         constexpr  std::string		delimiter(char del = '=') const;
+        constexpr  std::string		header(const std::string& str) const;
+        constexpr  std::string		header(const std::string&& str) const;
         constexpr const std::string generatingStrings(const std::string& str, const std::string& str2 = "", char del = ' ')   const;
         constexpr const std::string generatingStrings(const std::string&& str, const std::string&& str2 = "", char del = ' ') const;
 
@@ -53,7 +55,6 @@ namespace WORK {
 
         constexpr size_t getMaxTableWidth()			const;					// возврат ширины максимальной длины используемой строки в приложении
         constexpr size_t getMaxTableColumns()		const;					// возврат количества колонок "таблицы", при выводе данных массива и хеш-таблиц
-        constexpr size_t getMaxLengthString()	    const;			        // возврат количества колонок "таблицы", при выводе данных массива и хеш-таблиц
 
         Keys getActiveKey()							const;					// возврат текущего кода клавиши
         void setActiveKey(Keys key);
@@ -222,6 +223,28 @@ void WORK::CommonInterface<TypeContainer>
     }
 
     out << hr;
+}
+
+
+template <class TypeContainer>
+constexpr std::string WORK::CommonInterface<TypeContainer>
+::header(const std::string& str) const
+{
+    return header(std::move(str));
+}
+
+
+template <class TypeContainer>
+constexpr std::string WORK::CommonInterface<TypeContainer>
+::header(const std::string&& str) const
+{
+    auto delim{ delimiter() };
+    auto delim2{ delimiter(' ')};
+    std::string result{ delim };
+    result += delim2;
+    result += generatingStrings(str);
+    result += delim2;
+    return result + delim;
 }
 
 
