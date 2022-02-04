@@ -298,13 +298,13 @@ void WORK::ContainerInterface<TypeContainer>
     addToStatusBar(delimiter('-'));
     addToStatusBar(generatingStrings("Строка до сортировки", arrayToString()));
     addToStatusBar(delimiter('-'));
-    for (auto it{ begin }, ite{ end }; it != ite; ++it) {
+    for (auto it{ begin }, ite{ std::prev(end) }; it != ite; ++it) {
         min = it;
-        countOfShipments += 3;
         for (auto it_j{ std::next(it) }, ite_j{ end }; it_j != ite_j; ++it_j) {
             ++countOfComparisons;
             if (*it_j < *min) min = it_j;			
         }
+        countOfShipments += 3;
         std::iter_swap(it, min);
         auto distance{ std::distance(begin, it) + 1 };
         addToStatusBar(generatingStrings(std::to_string(distance), arrayToString()));
@@ -349,11 +349,13 @@ void WORK::ContainerInterface<TypeContainer>
                 std::iter_swap(std::prev(it), it);
                 ++countOfShipments;
             }
+            addToStatusBar(generatingStrings(std::string(1, *std::prev(it)) + std::string(1, *it)));
+            addToStatusBar(generatingStrings(std::to_string(++distance), arrayToString()));
+            addToStatusBar(delimiter('-'));
         }
         ++left;
 
-        addToStatusBar(generatingStrings(std::to_string(++distance), arrayToString()));
-        addToStatusBar(delimiter('-'));
+        addToStatusBar(delimiter('_'));
         for (auto it{ left }; it != right; ++it)
         {
             ++countOfComparisons;
@@ -363,12 +365,16 @@ void WORK::ContainerInterface<TypeContainer>
                 ++countOfShipments;
                 
             }
+            addToStatusBar(generatingStrings(std::string(1, *std::prev(it)) + std::string(1, *it)));
+            addToStatusBar(generatingStrings(std::to_string(++distance), arrayToString()));
+            addToStatusBar(delimiter('-'));
         }
         if (left == right) break;
         --right;
 
         addToStatusBar(generatingStrings(std::to_string(++distance), arrayToString()));
         addToStatusBar(delimiter('-'));
+        addToStatusBar(delimiter());
     }
 
     addToStatusBar(generatingStrings("Строка после сортировки", arrayToString()));
@@ -395,25 +401,30 @@ void WORK::ContainerInterface<TypeContainer>
     size_t countOfComparisons{};
     size_t countOfShipments{};
 
-    size_t distance{};
-    for (size_t step{ array.size() >> 1}; step; step >>= 1)
+    auto first{ array.begin() };
+    auto last{ array.end() };
+    auto distance{ last - first };
+    for (auto d{ 3 }; d > 0 ; d -= 2)
     {
-        for (size_t i{ step }, j{}; i < array.size(); ++i)
+        for (auto i{ first + d }; i != last; ++i)
         {
-            TypeContainer tmp{ array[i] };
-            for (j = i; j >= step; j -= step)
+            for (auto j = i; j - first >= d; j -= d)
             {
                 ++countOfComparisons;
-                if (tmp < array[j - step]) array[j] = array[j - step];                
+                addToStatusBar(generatingStrings(std::string(1, *j) + std::string(1, *(j - d))));
+                if (*j < *(j - d))
+                {
+                    ++countOfShipments;
+                    addToStatusBar(generatingStrings(std::string(1, *j) + std::string(1, *(j - d))));
+                    std::iter_swap(j, j - d);
+                }
                 else break;
+                addToStatusBar(generatingStrings(arrayToString()));
             }
-            array[j] = tmp;
-            ++countOfShipments;
         }
-        addToStatusBar(generatingStrings(std::to_string(++distance), arrayToString()));
+
         addToStatusBar(delimiter('-'));
     }
-
 
     addToStatusBar(generatingStrings("Строка после сортировки", arrayToString()));
     addToStatusBar(delimiter('-'));
@@ -441,17 +452,28 @@ void WORK::ContainerInterface<TypeContainer>
 
     TypeContainer elem{ data[curr] };
     size_t child{};
+    addToStatusBar(delimiter('-'));
+    addToStatusBar(generatingStrings("0_start"));
+    addToStatusBar(generatingStrings(arrayToString()));
     while (curr <= size / 2)
     {
         child = curr + curr;
         if (child < size && data[child] < data[child + 1]) ++child;
-        if (elem >= data[child]) break;
+        if (elem >= data[child])
+        {
+            addToStatusBar(generatingStrings("SR " + std::string(1, data[child]) + "_" + std::string(1, data[child + 1])));
+            break;
+        }
         data[curr] = data[child];
         curr = child;
+
+        addToStatusBar(generatingStrings(std::string(1, data[child]) + " " + std::string(1, elem)));
     }
     data[curr] = elem;
 
-
+    addToStatusBar(generatingStrings(arrayToString()));
+    addToStatusBar(generatingStrings("1_end"));
+    addToStatusBar(delimiter('-'));
 }
 
 
@@ -496,14 +518,19 @@ void WORK::ContainerInterface<TypeContainer>
         while (data[i] < x) ++i;
         while (data[j] > x) --j;  
         if (i <= j) {
-            if (i < j)  std::swap(data[i], data[j]);            
+            if (i < j)
+            {
+                addToStatusBar(generatingStrings(std::to_string(i) + "\t"+ std::string(1, data[i]) + std::string(1, data[j]) + "\t" + std::to_string(j)));
+                std::swap(data[i], data[j]);
+            }
             ++i;
             --j;
         }
-
+        addToStatusBar(generatingStrings("i " + std::to_string(i) + " j " + std::to_string(j)));
         addToStatusBar(generatingStrings(std::to_string(++cnt), arrayToString()));
         addToStatusBar(delimiter('-'));
     }
+    addToStatusBar(generatingStrings("i " + std::to_string(i) + " end"));
     if (i < end) hoare(data, i, end, cnt);
     if (begin < j) hoare(data, begin, j, cnt);
 
@@ -532,7 +559,10 @@ std::list<TypeContainer> WORK::ContainerInterface<TypeContainer>
 {
     std::list<TypeContainer> result;
     auto it_r{ std::back_inserter(result) };
-
+    std::sort(first, last);
+    std::sort(first2, last2);
+    addToStatusBar(generatingStrings("Фамилия: " + arrayToString(first, last)));
+    addToStatusBar(generatingStrings("Имя: " + arrayToString(first2, last2)));
     for (; first != last; ++it_r) {
         if (first2 == last2) {
             std::copy(first, last, it_r);
@@ -546,6 +576,7 @@ std::list<TypeContainer> WORK::ContainerInterface<TypeContainer>
             *it_r = *first;
             ++first;
         }
+        addToStatusBar(generatingStrings(arrayToString(result.begin(), result.end())));
     }
     std::copy(first2, last2, it_r);
     return result;
@@ -556,14 +587,16 @@ template<typename TypeContainer>
 void WORK::ContainerInterface<TypeContainer>
 ::showMerge()
 {
+    auto copy_firstName{ firstName };
+    auto copy_lastName{ lastName };
     std::list<TypeContainer> lst{ merge(lastName.begin(), lastName.end(), firstName.begin(), firstName.end()) };
 
     std::string result;
     std::copy(lst.begin(), lst.end(), std::back_inserter(result));
     addToStatusBar("Сортировка слиянием", StringFormat::On);
-    addToStatusBar(generatingStrings("первый список", "\"" + lastName + "\""));
+    addToStatusBar(generatingStrings("первый список", "\"" + copy_lastName + "\""));
     addToStatusBar(delimiter('-'));
-    addToStatusBar(generatingStrings("второй список", "\"" + firstName + "\""));
+    addToStatusBar(generatingStrings("второй список", "\"" + copy_firstName + "\""));
 
     addToStatusBar(delimiter('-'));
     addToStatusBar(generatingStrings("результатирующий список", "\"" + result + "\""));
@@ -737,17 +770,23 @@ std::pair<bool, size_t> WORK::ContainerInterface<TypeContainer>
         Iter middle{ left + (distance / 2) };
         if (*middle == elem_t)
         {
-            addToStatusBar(generatingStrings(std::to_string(*middle) + " == " + std::to_string(elem_t)));
+            auto length{ std::distance(left, middle) };
+            addToStatusBar(generatingStrings(std::to_string(length) + " " 
+                + std::string(1, *middle + 'А' - 1) + " == " + std::string(1, elem_t + 'А' - 1)));
             return { true, countOfComparisons };
         }
         if (*middle < elem_t)
         {
-            addToStatusBar(generatingStrings(std::to_string(*middle) + " < " + std::to_string(elem_t)));
+            auto length{ std::distance(left, middle) };
+            addToStatusBar(generatingStrings(std::to_string(length) + " " 
+                + std::string(1, *middle + 'А' - 1) + " < " + std::string(1, elem_t + 'А' - 1)));
             left = middle + 1;
         }
         else
         {
-            addToStatusBar(generatingStrings(std::to_string(*middle) + " > " + std::to_string(elem_t)));
+            auto length{ std::distance(left, middle) };
+            addToStatusBar(generatingStrings(std::to_string(length) + " " 
+                + std::string(1, *middle + 'А' - 1) + " > " + std::string(1, elem_t + 'А' - 1)));
             right = middle - 1;
         }
         ++countOfComparisons;
