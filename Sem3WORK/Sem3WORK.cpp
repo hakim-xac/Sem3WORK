@@ -23,7 +23,6 @@ int main()
 
 
     ContainerInterface<char> window{};
-
      
     /* Запускаем бесконечный цикл ожидая ввод команды от пользователя  */
     while (true)
