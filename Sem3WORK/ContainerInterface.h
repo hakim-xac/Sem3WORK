@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CONTAINER_INTERFACE_WORK
+#define CONTAINER_INTERFACE_WORK
 
 #include <vector>
 #include <list>
@@ -6,6 +7,7 @@
 #include <map>
 #include <algorithm>
 #include <iterator>
+#include <limits>
 #include "CommonInterface.h"
 #include "enums.h"
 
@@ -794,3 +796,5 @@ std::pair<bool, size_t> WORK::ContainerInterface<TypeContainer>
     return { false, countOfComparisons };
 }
 
+
+#endif

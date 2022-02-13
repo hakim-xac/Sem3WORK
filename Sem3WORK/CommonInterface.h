@@ -1,4 +1,5 @@
-#pragma once
+#ifndef COMMON_INTERFACE_WORK
+#define COMMON_INTERFACE_WORK
 
 #include <string>
 #include <queue>
@@ -307,3 +308,5 @@ constexpr void WORK::CommonInterface<TypeContainer>
 }
 
 
+
+#endif

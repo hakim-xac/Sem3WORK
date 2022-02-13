@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ENUMS_WORK
+#define ENUMS_WORK
 namespace WORK {
     enum class Keys {
         Exit = 48										// Key 0, Выход
@@ -56,3 +57,5 @@ namespace WORK {
 
 
 
+
+#endif

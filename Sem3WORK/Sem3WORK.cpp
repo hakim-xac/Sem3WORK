@@ -1,19 +1,21 @@
-﻿#pragma once
+﻿#ifndef MAIN_WORK
+#define MAIN_WORK
 
 #include <iostream>
-#include "enums.h"
 #include "ContainerInterface.h"
 #include <windows.h>
 namespace WORK {
     void setWindow(short width, short height)
     {
-        _SMALL_RECT Rect{ 0, 0, width - 1, width - 1 };
+        _SMALL_RECT Rect{ 0, 0, static_cast<SHORT>(width - 1), static_cast<SHORT>(width - 1) };
         HANDLE Handle{ GetStdHandle(STD_OUTPUT_HANDLE) };
         SetConsoleScreenBufferSize(Handle, _COORD{ width , height });
         SetConsoleWindowInfo(Handle, TRUE, &Rect);
     }
 }
 
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "EndlessLoop"
 int main()
 {
     using namespace WORK;                           // Подключаем пространство имен нашей программы
@@ -36,3 +38,7 @@ int main()
         window.readKey();
     }
 }
+#pragma clang diagnostic pop
+
+
+#endif
